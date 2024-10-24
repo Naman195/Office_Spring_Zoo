@@ -1,0 +1,103 @@
+show databases;
+use nationalzoo;
+
+show tables;
+
+CREATE TABLE Country (
+    country_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    country_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE State (
+    state_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    state_name VARCHAR(255) NOT NULL,
+    country_id BIGINT NOT NULL,
+    FOREIGN KEY (country_id) REFERENCES Country(country_id)
+);
+
+CREATE TABLE City (
+    city_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    city_name VARCHAR(255) NOT NULL,
+    state_id BIGINT NOT NULL,
+    FOREIGN KEY (state_id) REFERENCES State(state_id)
+);
+
+CREATE TABLE Address (
+    address_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    street VARCHAR(255),
+    zip_code VARCHAR(20),
+    city_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT Null ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    FOREIGN KEY (city_id) REFERENCES City(city_id)
+);
+
+desc Address;
+
+
+CREATE TABLE User (
+    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    address_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (address_id) REFERENCES Address(address_id)
+);
+
+desc user;
+
+CREATE TABLE Zoo (
+    zoo_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    zoo_name VARCHAR(255) NOT NULL,
+    address_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT null ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NOT NULL,
+    updated_by VARCHAR(255),
+    FOREIGN KEY (address_id) REFERENCES Address(address_id)
+);
+
+CREATE TABLE Animal (
+    animal_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    animal_name VARCHAR(255) NOT NULL,
+    animal_type VARCHAR(255) NOT NULL,
+    zoo_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    created_by VARCHAR(255) NOT NULL,
+    updated_by VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT null ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (zoo_id) REFERENCES Zoo(zoo_id),
+    FOREIGN KEY (user_id) REFERENCES User(user_id)
+);
+
+desc Animal;
+
+
+select * from city;
+
+
+
+
+INSERT INTO city (city_name, state_id)
+VALUES 
+('Mumbai', 2), -- Maharashtra
+('Pune', 2), -- Maharashtra
+('Ghaziabad', 1), -- 
+('Meerut', 1), -- UP
+('Haridwar', 3), -- UK
+('Rishikesh', 3), -- UP
+('San Francisco', 5), -- California
+('Los Angeles', 5), -- California
+('Sydney', 7), -- New South Wales
+('Melbourne', 8); -- Victoria
+
+
+
+select * from country;
+
+desc state;
