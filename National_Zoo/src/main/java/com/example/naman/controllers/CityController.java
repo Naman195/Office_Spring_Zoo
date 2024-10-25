@@ -13,7 +13,7 @@ import com.example.naman.entities.City;
 import com.example.naman.services.CityService;
 
 @RestController
-@RequestMapping("/api/zoo")
+@RequestMapping("/api/auth")
 public class CityController {
 
 	@Autowired

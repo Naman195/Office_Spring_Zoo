@@ -2,6 +2,7 @@ package com.example.naman.controllers;
 
 import java.util.List;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -101,6 +103,26 @@ public class UserController {
 			return ResponseEntity.badRequest().body(null);
 		}
 	}
+	
+	@PostMapping("/forgotpassword")
+	public ResponseEntity<String> forgotPassword(@RequestBody String userName)
+	{
+		
+		System.out.printf("UserName is", userName);
+		String url = userService.forgotPassword(userName);
+		return ResponseEntity.ok(url);
+	}
+	
+	@PostMapping("/setpassword")
+	public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader, @RequestBody String setPassword)
+	{
+		String res = userService.setPassword(tokenHeader, setPassword);
+		return ResponseEntity.ok(res);
+	}
+	
+	
+	
+	
 	
 
 	

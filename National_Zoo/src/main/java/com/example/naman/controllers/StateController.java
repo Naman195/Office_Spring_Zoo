@@ -14,7 +14,7 @@ import com.example.naman.entities.State;
 import com.example.naman.services.StateService;
 
 @RestController
-@RequestMapping("/api/zoo")
+@RequestMapping("/api/auth")
 public class StateController  {
 
 	@Autowired

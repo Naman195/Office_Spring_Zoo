@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.UserDTO.AddressDTO;
@@ -33,7 +34,11 @@ public class UserService {
 	@Autowired
 	private CityRepository cityRepository;
 	
+	@Autowired
+	private JwtService jwtService;
 
+	@Autowired
+	private BCryptPasswordEncoder bcryptPasswordEncoder;
 
 	@Autowired
     private  AuthenticationManager authenticationManager;
@@ -134,6 +139,31 @@ public class UserService {
 		deletedUser.setArchieved(!deletedUser.isArchieved());
 		userRepository.save(deletedUser);
 		
+	}
+	
+	public String forgotPassword(String username)
+	{
+		User user = userRepository.findByuserName(username).orElseThrow(() -> new RuntimeException("User Name is not Valid"));
+		
+		String forgotPasswordToken = jwtService.generateToken(user);
+		
+		String url =  forgotPasswordToken;
+		
+		return url;
+	}
+	
+	
+	
+	public String setPassword(String tokenHeader, String newPassword)
+	{
+		
+		String token = tokenHeader.substring(7);
+		String username = jwtService.extractUsername(token);
+		User user = userRepository.findByuserName(username).get();
+		String encodedPass = bcryptPasswordEncoder.encode(newPassword);
+		user.setPassword(encodedPass);
+		userRepository.save(user);
+		return "Password Update Successfully";
 	}
 	
 	

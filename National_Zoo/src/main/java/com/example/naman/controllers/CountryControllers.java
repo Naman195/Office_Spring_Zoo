@@ -12,7 +12,7 @@ import com.example.naman.entities.Country;
 import com.example.naman.services.CountryService;
 
 @RestController
-@RequestMapping("/api/zoo")
+@RequestMapping("/api/auth")
 public class CountryControllers {
 
 	@Autowired

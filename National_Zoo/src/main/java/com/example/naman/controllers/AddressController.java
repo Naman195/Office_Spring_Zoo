@@ -10,7 +10,7 @@ import com.example.naman.entities.Address;
 import com.example.naman.services.AddressService;
 
 @RestController
-@RequestMapping("/api/zoo")
+@RequestMapping("/api/auth")
 public class AddressController {
 
 	@Autowired

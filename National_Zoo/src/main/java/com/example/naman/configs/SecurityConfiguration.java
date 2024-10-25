@@ -37,7 +37,7 @@ public class SecurityConfiguration {
         .formLogin((form) -> form.disable())
         .logout((logout) -> logout.disable())
         .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/auth/user/login", "/api/auth/user/create", "/api/zoo/countries", "/api/zoo/state/", "/api/zoo/cities/")
+                        .requestMatchers("/api/auth/user/login", "/api/auth/user/create", "/api/auth/countries", "/api/auth/state/*", "/api/auth/cities/*", "api/auth/forgotpassword")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -53,8 +53,8 @@ return http.build();
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:8005"));
-        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS") );
+        configuration.setAllowedOrigins(List.of("http://localhost:3000/"));
+        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH") );
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
