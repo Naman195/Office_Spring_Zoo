@@ -147,9 +147,9 @@ public class UserService {
 		
 		String forgotPasswordToken = jwtService.generateToken(user);
 		
-		String url =  forgotPasswordToken;
+		String url = "http://localhost:3000/setpass?token=" +  forgotPasswordToken;
 		
-		return url;
+		return  url;
 	}
 	
 	

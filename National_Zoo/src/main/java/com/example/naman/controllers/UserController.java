@@ -114,7 +114,8 @@ public class UserController {
 	}
 	
 	@PostMapping("/setpassword")
-	public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader, @RequestBody String setPassword)
+	public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader
+			, @RequestBody String setPassword)
 	{
 		String res = userService.setPassword(tokenHeader, setPassword);
 		return ResponseEntity.ok(res);
