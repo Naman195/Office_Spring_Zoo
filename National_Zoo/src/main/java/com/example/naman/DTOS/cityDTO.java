@@ -1,4 +1,4 @@
-package com.example.naman.UserDTO;
+package com.example.naman.DTOS;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

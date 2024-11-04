@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.naman.UserDTO.UpdateUserDTO;
-import com.example.naman.UserDTO.UserResponse;
-import com.example.naman.entities.Credentials;
+import com.example.naman.DTOS.CredentialsDTO;
+import com.example.naman.DTOS.UpdateUserDTO;
+import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.User;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.UserService;
@@ -48,14 +48,14 @@ public class UserController {
 	        userService.createUser(user);
 	        return ResponseEntity.status(HttpStatus.CREATED).body("User SuccessFully Created");
 	    } catch (Exception e) {
-	        // Return a bad request or custom error message if something goes wrong
+	        
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User creation failed.");
 	    }
 
 	}
 	
 	@PostMapping("/user/login")
-	public UserResponse LoginUser(@RequestBody Credentials cred ){		
+	public UserResponse LoginUser(@RequestBody CredentialsDTO cred ){		
 		UserResponse authenticatedUser =  userService.LoginUser(cred.getUsername(), cred.getPassword());
 		User user1 = userService.findByUsername(cred.getUsername());
 		String jwtToken = jwtService.generateToken(user1);
@@ -86,7 +86,7 @@ public class UserController {
 		return userService.UpdateUserById(user, id);
 	}
 	
-//	@CrossOrigin("http://localhost:3000")
+
 	@PatchMapping("/user/delete/{id}")
 	public String deleteUser(@PathVariable Long id) {
 		userService.deleteUserById(id);
@@ -107,8 +107,6 @@ public class UserController {
 	@PostMapping("/forgotpassword")
 	public ResponseEntity<String> forgotPassword(@RequestBody String userName)
 	{
-		
-		System.out.printf("UserName is", userName);
 		String url = userService.forgotPassword(userName);
 		return ResponseEntity.ok(url);
 	}
@@ -120,12 +118,5 @@ public class UserController {
 		String res = userService.setPassword(tokenHeader, setPassword);
 		return ResponseEntity.ok(res);
 	}
-	
-	
-	
-	
-	
-
-	
-	
+		
 }

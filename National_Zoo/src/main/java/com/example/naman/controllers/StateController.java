@@ -23,7 +23,7 @@ public class StateController  {
 	
 	@GetMapping("/state/{id}")
 	public List<State> getAllStates(@PathVariable Long id){
-		List<State> states = stateService.getStatesByCountryId(id);
-		return states;
+		return stateService.getStatesByCountryId(id);
+		
 	}
 }

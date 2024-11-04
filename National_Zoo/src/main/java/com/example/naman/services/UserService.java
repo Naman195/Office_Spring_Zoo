@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.naman.UserDTO.AddressDTO;
-import com.example.naman.UserDTO.UpdateUserDTO;
-import com.example.naman.UserDTO.UserResponse;
+import com.example.naman.DTOS.AddressDTO;
+import com.example.naman.DTOS.UpdateUserDTO;
+import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.Address;
 import com.example.naman.entities.City;
 import com.example.naman.entities.User;
@@ -45,7 +45,8 @@ public class UserService {
 	
 	@Transactional
 	public User createUser(User user) {
-		String pass = new BCryptPasswordEncoder().encode(user.getPassword());
+//		String pass = new BCryptPasswordEncoder().encode(user.getPassword());
+		String pass = bcryptPasswordEncoder.encode(user.getPassword());
 		user.setPassword(pass);
 		return userRepository.save(user);
 	}
@@ -59,7 +60,7 @@ public class UserService {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Username");
 		}
 		String pass = user.getPassword();
-		if(!(new BCryptPasswordEncoder().matches( password,pass)))
+		if(!(bcryptPasswordEncoder.matches( password,pass)))
 		{
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Password");
 		}
@@ -95,7 +96,6 @@ public class UserService {
 	public User UpdateUserById(User user,  Long id) {
 	
 		User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found By Id"));
-		System.out.println(existingUser);
 		
 		existingUser.setFirstName(user.getFirstName());
 		existingUser.setLastName(user.getLastName());
@@ -165,28 +165,6 @@ public class UserService {
 		userRepository.save(user);
 		return "Password Update Successfully";
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 }

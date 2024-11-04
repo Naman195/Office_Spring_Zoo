@@ -14,6 +14,7 @@ import com.example.naman.repositories.UserRepository;
 
 @Configuration
 public class ApplicationConfiguration {
+	
     private final UserRepository userRepository;
 
     public ApplicationConfiguration(UserRepository userRepository) {

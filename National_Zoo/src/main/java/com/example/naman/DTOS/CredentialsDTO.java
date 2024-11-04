@@ -1,6 +1,6 @@
-package com.example.naman.entities;
+package com.example.naman.DTOS;
 
-public class Credentials {
+public class CredentialsDTO {
 
 	private String username;
 	private String password;

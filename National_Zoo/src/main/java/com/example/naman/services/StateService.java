@@ -12,26 +12,18 @@ import com.example.naman.repositories.StateRepository;
 import lombok.RequiredArgsConstructor;
 
 
-@RequiredArgsConstructor
+
 @Service
 public class StateService {
 
 	
-	private final  StateRepository stateRepository;
+	@Autowired
+	private StateRepository stateRepository;
 	
-	private final CountryRepository countryRepository;
-	
-	
-	
+
 	public List<State> getStatesByCountryId(Long id)
 	{
 		return stateRepository.findByCountryCountryId(id);
 	}
 
-//	public List<State> getStateByCountryName(String name){
-//		List<State> states = stateRepository.findByName(name);
-//		return states;
-//	}
-	
-	
 }
