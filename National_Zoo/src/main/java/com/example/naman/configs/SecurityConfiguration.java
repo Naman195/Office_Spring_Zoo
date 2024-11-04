@@ -39,8 +39,11 @@ public class SecurityConfiguration {
         .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/user/login", "/api/auth/user/create", "/api/auth/countries", "/api/auth/state/*", "/api/auth/cities/*", "api/auth/forgotpassword")
                         .permitAll()
+                        .requestMatchers("/api/auth/hello")
+                        .hasAuthority("ROLE_ADMIN")
                         .anyRequest()
                         .authenticated())
+        				
         .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .sessionManagement(management -> management

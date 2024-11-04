@@ -35,10 +35,5 @@ public class State {
 	@ManyToOne
 	@JoinColumn(name = "country_id", nullable = false)
 	private Country country;
-
-	
-	
-	
-	
 	
 }

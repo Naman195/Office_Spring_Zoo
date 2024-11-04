@@ -26,9 +26,10 @@ import com.example.naman.entities.User;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.UserService;
 
+import jakarta.persistence.PrePersist;
 import jakarta.validation.Valid;
 
-//@CrossOrigin("http://localhost:3000")
+
 @RestController
 @RequestMapping("/api/auth")
 public class UserController {
@@ -79,6 +80,11 @@ public class UserController {
 		return ResponseEntity.ok().body(user);
 	}
 	
+	@PreAuthorize("hasRole('admin')")
+	@GetMapping("/hello")
+	public String getName() {
+		return "Hello";
+	}
 	
 	@PutMapping("/user/update/{id}")
 	public User updateUserById(@Valid @RequestBody User user, @PathVariable Long id)
@@ -86,7 +92,7 @@ public class UserController {
 		return userService.UpdateUserById(user, id);
 	}
 	
-
+	@PreAuthorize("hasAuthority('ROLE_admin')")
 	@PatchMapping("/user/delete/{id}")
 	public String deleteUser(@PathVariable Long id) {
 		userService.deleteUserById(id);

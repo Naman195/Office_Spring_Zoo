@@ -2,11 +2,13 @@ package com.example.naman.entities;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -59,6 +61,9 @@ public class User implements UserDetails {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
+	@Column(name = "role", nullable = false)
+	private String role;
+	
 	@OneToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "address_id")
 	private Address address;
@@ -75,8 +80,7 @@ public class User implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
 	}
 
 	@Override
