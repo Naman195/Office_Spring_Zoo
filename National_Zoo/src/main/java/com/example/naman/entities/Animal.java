@@ -42,6 +42,9 @@ public class Animal {
 	@Column(name = "animal_type", nullable = false)
 	private String animalType;
 	
+	
+	private boolean archieved;
+	
 	@ManyToOne
 	@JoinColumn(name = "zoo_id", nullable = false)
 	private Zoo zoo;

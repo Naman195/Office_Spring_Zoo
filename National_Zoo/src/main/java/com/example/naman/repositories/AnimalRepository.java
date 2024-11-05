@@ -6,5 +6,4 @@ import com.example.naman.entities.Animal;
 
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 		
-
 }
