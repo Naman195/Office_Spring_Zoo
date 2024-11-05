@@ -46,9 +46,7 @@ public class Animal {
 	@JoinColumn(name = "zoo_id", nullable = false)
 	private Zoo zoo;
 	
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
+	
 	
 	@Column(name = "created_by", nullable = false)
 	private String createdBy;

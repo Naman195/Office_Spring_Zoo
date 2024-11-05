@@ -41,6 +41,8 @@ public class Zoo {
 	@JoinColumn(name = "address_id", nullable = true)
 	private Address address;
 	
+	private boolean archieved;
+	
 	
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)
