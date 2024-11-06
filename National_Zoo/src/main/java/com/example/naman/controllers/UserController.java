@@ -92,7 +92,7 @@ public class UserController {
 		return userService.UpdateUserById(user, id);
 	}
 	
-	@PreAuthorize("hasAuthority('ROLE_admin')")
+	@PreAuthorize("hasRole('admin')")
 	@PatchMapping("/user/delete/{id}")
 	public String deleteUser(@PathVariable Long id) {
 		userService.deleteUserById(id);

@@ -5,6 +5,8 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.naman.entities.Zoo;
@@ -24,10 +26,12 @@ public class ZooService {
 		return zooRepository.save(zoo);
 	}
 	
-	public List<Zoo> getAllZoo() {
-		List<Zoo> allZoo =  zooRepository.findAll();
-		List<Zoo> filteredZoo = allZoo.stream().filter(zoo -> !zoo.isArchieved()).collect(Collectors.toList());
-		return filteredZoo;
+	public Page<Zoo> getAllZoo(Pageable pageable) {
+		
+		return zooRepository.findByArchievedFalse(pageable);
+//		List<Zoo> allZoo =  zooRepository.findAll();
+//		List<Zoo> filteredZoo = allZoo.stream().filter(zoo -> !zoo.isArchieved()).collect(Collectors.toList());
+//		return filteredZoo;
 	}
 	
 	public Zoo getZooById(Long id) {
