@@ -17,9 +17,9 @@ public class AuditorAwareImpl implements  AuditorAware<String> {
 		if(Objects.isNull(authentication)) {
 			return Optional.of("System");
 		}
-		
-		if(authentication.getPrincipal() instanceof Zoo zoo) {
-			 return Optional.ofNullable(zoo.getZooId().toString());
+			
+		if(authentication.getPrincipal() instanceof User user) {
+			 return Optional.ofNullable(user.getUsername().toString());
         } else {
             return Optional.of(authentication.getName());
         }

@@ -4,14 +4,21 @@ import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +35,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "animal")
+@EntityListeners(AuditingEntityListener.class)
 public class Animal {
 	
 	@Id
@@ -50,21 +58,28 @@ public class Animal {
 	private Zoo zoo;
 	
 	
-	
+	@CreatedBy
 	@Column(name = "created_by", nullable = false)
 	private String createdBy;
 	
+	@LastModifiedBy
 	@Column(name = "updated_by", nullable = true)
 	private String updatedBy;
 	
+	 @CreatedDate
 	 @CreationTimestamp
 	 @Column(name = "created_at", updatable = false)
 	 private Instant createdAt;
 
 	 @UpdateTimestamp
+	 @LastModifiedDate
 	 @Column(name = "updated_at", updatable = true)
-	 private Instant updatedAt;
-
+	 private String updatedAt;
+	 
+	 @PrePersist
+		public void func() {
+		 updatedBy = null;
+		}
 	
 
 }

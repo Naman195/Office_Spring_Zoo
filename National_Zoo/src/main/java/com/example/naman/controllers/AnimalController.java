@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.naman.entities.Animal;
+import com.example.naman.entities.Zoo;
 import com.example.naman.services.AnimalService;
+import com.example.naman.services.ZooService;
 
 @RestController
 @RequestMapping("/api/animal")
@@ -25,10 +27,18 @@ public class AnimalController {
 	@Autowired
 	private AnimalService animalService;
 	
+	@Autowired
+	private ZooService zooService;
+	
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/add")
 	public Animal saveAnimal(@RequestBody Animal animal) {
 		
+		Zoo zoo = zooService.getZooById(animal.getZoo().getZooId());
+		if (zoo == null) {
+	        throw new RuntimeException("Zoo not found");
+	    }
+		animal.setZoo(zoo);
 		return animalService.addAnimal(animal);
 	}
 	
