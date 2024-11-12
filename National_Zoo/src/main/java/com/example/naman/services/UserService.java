@@ -45,32 +45,29 @@ public class UserService {
 	
 	@Transactional
 	public User createUser(User user) {
-//		String pass = new BCryptPasswordEncoder().encode(user.getPassword());
+		if (userRepository.findByuserName(user.getUsername()).isPresent()) {
+	        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+	    }
 		String pass = bcryptPasswordEncoder.encode(user.getPassword());
 		user.setPassword(pass);
+		
+		
 		return userRepository.save(user);
 	}
 	
-	public UserResponse LoginUser(String username, String password)
-	{
+	public UserResponse LoginUser(String username, String password) {
+	    User user = userRepository.findByuserName(username)
+	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-	
-		User user = userRepository.findByuserName(username).orElseThrow(() -> new RuntimeException("User Not Found By UserName"));
-		if(user ==  null) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Username");
-		}
-		String pass = user.getPassword();
-		if(!(bcryptPasswordEncoder.matches( password,pass)))
-		{
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Password");
-		}
-		
-		authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-        );
-		
-		
-		return new UserResponse(user.getUserId(), user.getUsername(), "");
+	    if (!bcryptPasswordEncoder.matches(password, user.getPassword())) {
+	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
+	    }
+
+	    authenticationManager.authenticate(
+	        new UsernamePasswordAuthenticationToken(username, password)
+	    );
+
+	    return new UserResponse(user.getUserId(), user.getUsername(), "", "");
 	}
 	
 	
@@ -83,19 +80,26 @@ public class UserService {
 		
 	}
 	
+//	public User getUserById(Long id) {
+//		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found"));
+//		return user;
+//	}
+	
 	public User getUserById(Long id) {
-		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found"));
-		return user;
+	    return userRepository.findById(id)
+	        .filter(user -> !user.isArchieved())
+	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	}
 	
 	public User findByUsername(String username) {
-		User user = userRepository.findByuserName(username).orElseThrow(() -> new RuntimeException("User Not Found"));
-		return user;
-	}
+		return userRepository.findByuserName(username)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	    }
 	
 	public User UpdateUserById(User user,  Long id) {
 	
-		User existingUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found By Id"));
+		User existingUser = userRepository.findById(id)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 		
 		existingUser.setFirstName(user.getFirstName());
 		existingUser.setLastName(user.getLastName());
@@ -107,64 +111,75 @@ public class UserService {
 		
 	}
 	
-	public User partialUpdateUserById(Long id, UpdateUserDTO dto) {
-		Optional<User> optionalUser = userRepository.findById(id);
-		if(optionalUser.isPresent())
-		{
-			User user = optionalUser.get();
-			Address address = user.getAddress();
-		
-		
-		user.setFirstName(dto.getFirstName());
-		user.setLastName(dto.getLastName());
-		AddressDTO addressDTO = dto.getAddress();
-		address.setStreet(addressDTO.getStreet());
-		address.setZipCode(addressDTO.getZipCode());
-		
-		City city = cityRepository.findById(addressDTO.getCity().getCityId()).orElseThrow(() -> new RuntimeException("City is not Found"));
-		address.setCity(city);
-		userRepository.save(user);
-		return user;
-		
-		}
-		else {
-	        throw new RuntimeException("User not found");
+	 public User partialUpdateUserById(Long id, UpdateUserDTO dto) {
+	        // Fetch user by ID
+	        User user = userRepository.findById(id)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+	        // Update user fields
+	        user.setFirstName(dto.getFirstName());
+	        user.setLastName(dto.getLastName());
+
+	        // Update address fields
+	        Address address = user.getAddress();
+	        AddressDTO addressDTO = dto.getAddress();
+	        
+	        if (addressDTO != null) {
+	            address.setStreet(addressDTO.getStreet());
+	            address.setZipCode(addressDTO.getZipCode());
+
+	            City city = cityRepository.findById(addressDTO.getCity().getCityId())
+	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
+	            address.setCity(city);
+	        }
+
+	        return userRepository.save(user);
 	    }
-		
-		
-	}
 	
-	public void deleteUserById(Long id) {
-		User deletedUser = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found By Id"));
-		deletedUser.setArchieved(!deletedUser.isArchieved());
-		userRepository.save(deletedUser);
-		
-	}
+	 public void deleteUserById(Long id) {
+	        // Fetch and toggle the archived status
+	        User user = userRepository.findById(id)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	        
+	        user.setArchieved(!user.isArchieved());
+	        userRepository.save(user);
+	    }
 	
-	public String forgotPassword(String username)
-	{
-		User user = userRepository.findByuserName(username).orElseThrow(() -> new RuntimeException("User Name is not Valid"));
-		
-		String forgotPasswordToken = jwtService.generateToken(user);
-		
-		String url = "http://localhost:3000/setpass?token=" +  forgotPasswordToken;
-		
-		return  url;
-	}
+	 public String forgotPassword(String username) {
+	        // Fetch user by username
+	        User user = userRepository.findByuserName(username)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username is not valid"));
+
+	        // Generate forgot password token
+	        String forgotPasswordToken = jwtService.generateToken(user);
+
+	        // Construct the URL for resetting the password
+	        return "http://localhost:3000/setpass?token=" + forgotPasswordToken;
+	    }
 	
 	
 	
-	public String setPassword(String tokenHeader, String newPassword)
-	{
-		
-		String token = tokenHeader.substring(7);
-		String username = jwtService.extractUsername(token);
-		User user = userRepository.findByuserName(username).get();
-		String encodedPass = bcryptPasswordEncoder.encode(newPassword);
-		user.setPassword(encodedPass);
-		userRepository.save(user);
-		return "Password Update Successfully";
-	}
+
+	
+	public String setPassword(String tokenHeader, String newPassword) {
+        // Validate the token
+        if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token format");
+        }
+
+        String token = tokenHeader.substring(7);
+        String username = jwtService.extractUsername(token);
+        
+        // Fetch user by extracted username
+        User user = userRepository.findByuserName(username)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Update the password
+        user.setPassword(bcryptPasswordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "Password updated successfully";
+    }
 	
 	
 }

@@ -42,87 +42,108 @@ public class UserController {
 	
 	
 	
-	@PostMapping("/user/create")
-	public ResponseEntity<?>  createUser(@RequestBody User user) {
-		
-		try {
-	        userService.createUser(user);
-	        return ResponseEntity.status(HttpStatus.CREATED).body("User SuccessFully Created");
-	    } catch (Exception e) {
-	        
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User creation failed.");
+	  @PostMapping("/user/create")
+	    public ResponseEntity<String> createUser(@RequestBody User user) {
+	        try {
+	            userService.createUser(user);
+	            return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
+	        } catch (Exception e) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User creation failed: " + e.getMessage());
+	        }
 	    }
+	
 
-	}
 	
 	@PostMapping("/user/login")
-	public UserResponse LoginUser(@RequestBody CredentialsDTO cred ){		
-		UserResponse authenticatedUser =  userService.LoginUser(cred.getUsername(), cred.getPassword());
-		User user1 = userService.findByUsername(cred.getUsername());
-		String jwtToken = jwtService.generateToken(user1);
-		authenticatedUser.setToken(jwtToken);
-		return authenticatedUser;
-	}
+    public ResponseEntity<UserResponse> loginUser(@RequestBody CredentialsDTO credentials) {
+        try {
+            UserResponse authenticatedUser = userService.LoginUser(credentials.getUsername(), credentials.getPassword());
+            User user = userService.findByUsername(credentials.getUsername());
+            String jwtToken = jwtService.generateToken(user);
+            authenticatedUser.setToken(jwtToken);
+            return ResponseEntity.ok(authenticatedUser);
+        } catch (Exception e) {
+           
+            UserResponse errorResponse = new UserResponse();
+            
+            errorResponse.setMessage(e.getMessage()); 
+            
+          
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        }
+    }
 	
-	@GetMapping("/allusers")
-	public List<User> getAllUsers()
-	{
-		return userService.getAllUser();
-	}
+    @GetMapping("/allusers")
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUser();
+        return ResponseEntity.ok(users);
+    }
 	
-	@GetMapping("/user/{id}")
-	public ResponseEntity<?> getUserById(@PathVariable Long id)
-	{
-		User user =  userService.getUserById(id);
-		if(user.isArchieved()) {
-			return ResponseEntity.status(404).body("User NOt Found");
-		}
-		return ResponseEntity.ok().body(user);
-	}
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+    }
+	
 	
 	@PreAuthorize("hasRole('admin')")
-	@GetMapping("/hello")
-	public String getName() {
-		return "Hello";
-	}
-	
 	@PutMapping("/user/update/{id}")
-	public User updateUserById(@Valid @RequestBody User user, @PathVariable Long id)
-	{
-		return userService.UpdateUserById(user, id);
-	}
+    public ResponseEntity<?> updateUserById(@Valid @RequestBody User user, @PathVariable Long id) {
+        try {
+            User updatedUser = userService.UpdateUserById(user, id);
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User update failed: " + e.getMessage());
+        }
+    }
 	
+	// Partial Update User
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/user/delete/{id}")
-	public String deleteUser(@PathVariable Long id) {
-		userService.deleteUserById(id);
-		return "User Deleted SuccessFully";
-	}
+    @PatchMapping("/userupdate/{id}")
+    public ResponseEntity<?> partialUpdateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
+        try {
+            User updatedUser = userService.partialUpdateUserById(id, updateUserDTO);
+            return ResponseEntity.ok(updatedUser);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partial update failed: " + e.getMessage());
+        }
+    }
+	
+    @PreAuthorize("hasRole('admin')")
+    @PatchMapping("/user/delete/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUserById(id);
+            return ResponseEntity.ok("User status toggled successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User deletion failed: " + e.getMessage());
+        }
+    }
 
+
+    @PostMapping("/forgotpassword")
+    public ResponseEntity<String> forgotPassword(@RequestBody String username) {
+        try {
+            String url = userService.forgotPassword(username);
+            return ResponseEntity.ok(url);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Forgot password request failed: " + e.getMessage());
+        }
+    }
 	
-	@PatchMapping("/userupdate/{id}")
-	public ResponseEntity<User> partialUpdate(@PathVariable Long id, @RequestBody UpdateUserDTO updateUser) {
-		try {
-			User updatedUser = userService.partialUpdateUserById(id, updateUser);
-			return ResponseEntity.ok(updatedUser);
-		} catch (RuntimeException  e) {
-			return ResponseEntity.badRequest().body(null);
-		}
-	}
-	
-	@PostMapping("/forgotpassword")
-	public ResponseEntity<String> forgotPassword(@RequestBody String userName)
-	{
-		String url = userService.forgotPassword(userName);
-		return ResponseEntity.ok(url);
-	}
-	
-	@PostMapping("/setpassword")
-	public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader
-			, @RequestBody String setPassword)
-	{
-		String res = userService.setPassword(tokenHeader, setPassword);
-		return ResponseEntity.ok(res);
-	}
+    @PostMapping("/setpassword")
+    public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader,
+                                              @RequestBody String newPassword) {
+        try {
+            String response = userService.setPassword(tokenHeader, newPassword);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password update failed: " + e.getMessage());
+        }
+    }
 		
 }
