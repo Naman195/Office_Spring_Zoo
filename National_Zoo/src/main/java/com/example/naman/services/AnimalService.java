@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,11 @@ public class AnimalService {
 	
 	public Page<Animal> getAnimalByZooId(Long id, Pageable pageable)
 	{
-		return animalRepository.findByZooZooId(id, pageable);
+		
+		Page<Animal> allanimalsInZoo =  animalRepository.findByZooZooId(id, pageable);
+		List<Animal> filteredAnimals =  allanimalsInZoo.stream().filter(zoo -> !zoo.isArchieved()).collect(Collectors.toList());
+		return new PageImpl<>(filteredAnimals, pageable, allanimalsInZoo.getTotalElements());
+		
 	}
 	
 	public Animal getAnimalById(Long id)

@@ -67,7 +67,7 @@ public class UserService {
 	        new UsernamePasswordAuthenticationToken(username, password)
 	    );
 
-	    return new UserResponse(user.getUserId(), user.getUsername(), "", "");
+	    return new UserResponse(user.getUserId(), user.getUsername(), "", "User LoggedIn SuccessFully");
 	}
 	
 	
