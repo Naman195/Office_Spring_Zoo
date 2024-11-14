@@ -8,10 +8,8 @@ import com.example.naman.entities.Animal;
 
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 	
-	Page<Animal> findByZooZooId(Long id, Pageable pageable);
+	Page<Animal> findByArchievedFalseAndZooZooId(Long id, Pageable pageable);
 	
 	Page<Animal> findByArchievedFalse(Pageable pageable);
-	
-	
-		
+
 }

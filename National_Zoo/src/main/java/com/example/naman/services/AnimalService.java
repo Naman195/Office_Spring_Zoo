@@ -32,9 +32,10 @@ public class AnimalService {
 	public Page<Animal> getAnimalByZooId(Long id, Pageable pageable)
 	{
 		
-		Page<Animal> allanimalsInZoo =  animalRepository.findByZooZooId(id, pageable);
-		List<Animal> filteredAnimals =  allanimalsInZoo.stream().filter(zoo -> !zoo.isArchieved()).collect(Collectors.toList());
-		return new PageImpl<>(filteredAnimals, pageable, allanimalsInZoo.getTotalElements());
+		Page<Animal> allanimalsInZoo =  animalRepository.findByArchievedFalseAndZooZooId(id, pageable);
+//		List<Animal> filteredAnimals =  allanimalsInZoo.stream().filter(animal -> !animal.isArchieved()).collect(Collectors.toList());
+//		return new PageImpl<>(filteredAnimals, pageable, allanimalsInZoo.getTotalElements());
+		return allanimalsInZoo;
 		
 	}
 	
