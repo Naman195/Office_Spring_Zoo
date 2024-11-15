@@ -9,9 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.naman.DTOS.AddressDTO;
+import com.example.naman.DTOS.CreateZooDTO;
+import com.example.naman.entities.Address;
 import com.example.naman.entities.Zoo;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.ZooRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ZooService {
@@ -23,15 +27,18 @@ public class ZooService {
 
 	public Zoo createZoo(Zoo zoo)
 	{
+//		Zoo newZoo = new Zoo();
+//		newZoo.setZooName(zoo.getZooName());
+//		AddressDTO addressDTO = zoo.getAddress();
+//		newZoo.setAddress(addressDTO);
+//		
 		return zooRepository.save(zoo);
 	}
 	
 	public Page<Zoo> getAllZoo(Pageable pageable) {
 		
 		return zooRepository.findByArchievedFalse(pageable);
-//		List<Zoo> allZoo =  zooRepository.findAll();
-//		List<Zoo> filteredZoo = allZoo.stream().filter(zoo -> !zoo.isArchieved()).collect(Collectors.toList());
-//		return filteredZoo;
+
 	}
 	
 	public Zoo getZooById(Long id) {

@@ -76,6 +76,7 @@ public class UserService {
 	public List<User> getAllUser(){
 		List<User> users =  userRepository.findAll();
 		List<User> filteredusers = 	users.stream().filter(user -> !user.isArchieved()).collect(Collectors.toList());
+		
 		return filteredusers;
 		
 	}
