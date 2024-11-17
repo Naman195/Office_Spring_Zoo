@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AddressDTO;
+import com.example.naman.DTOS.CreateUserDTO;
+import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.Address;
@@ -43,16 +46,19 @@ public class UserService {
 	@Autowired
     private  AuthenticationManager authenticationManager;
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	@Transactional
-	public User createUser(User user) {
-		if (userRepository.findByuserName(user.getUsername()).isPresent()) {
+	public void createUser(CreateUserDTO userDTO) {
+		if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
 	        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 	    }
-		String pass = bcryptPasswordEncoder.encode(user.getPassword());
+		
+		User user = modelMapper.map(userDTO, User.class);
+		String pass = bcryptPasswordEncoder.encode(userDTO.getPassword());
 		user.setPassword(pass);
-		
-		
-		return userRepository.save(user);
+		userRepository.save(user);
 	}
 	
 	public UserResponse LoginUser(String username, String password) {
@@ -73,23 +79,34 @@ public class UserService {
 	
 	
 	
-	public List<User> getAllUser(){
+	public List<ResponseUserDTO> getAllUser(){
 		List<User> users =  userRepository.findAll();
+		
 		List<User> filteredusers = 	users.stream().filter(user -> !user.isArchieved()).collect(Collectors.toList());
 		
-		return filteredusers;
+		
+		List<ResponseUserDTO> allUsers = filteredusers.stream()
+				.map(user -> modelMapper.map(user, ResponseUserDTO.class)).collect(Collectors.toList());
+		
+		return allUsers;
 		
 	}
 	
-//	public User getUserById(Long id) {
-//		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User Not Found"));
-//		return user;
+
+	
+//	public ResponseUserDTO getUserById(Long id) {
+//	    User existingUser =  userRepository.findById(id)
+//	        .filter(user -> !user.isArchieved())
+//	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+//	    return modelMapper.map(existingUser, ResponseUserDTO.class);
 //	}
 	
-	public User getUserById(Long id) {
-	    return userRepository.findById(id)
+	public ResponseUserDTO getUserById(Long id) {
+	    User existingUser = userRepository.findById(id)
 	        .filter(user -> !user.isArchieved())
-	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + id + " not found"));
+	    
+	    return modelMapper.map(existingUser, ResponseUserDTO.class);
 	}
 	
 	public User findByUsername(String username) {

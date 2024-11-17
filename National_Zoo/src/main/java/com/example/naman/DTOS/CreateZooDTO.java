@@ -12,6 +12,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateZooDTO {
+	
+	
 	@NotNull(message = "Zoo Name is Required")
 	private String zooName;
 	@Valid

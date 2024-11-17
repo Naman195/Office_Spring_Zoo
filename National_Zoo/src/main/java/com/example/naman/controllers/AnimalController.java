@@ -1,5 +1,6 @@
 package com.example.naman.controllers;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.naman.DTOS.AnimalResponseDTO;
+import com.example.naman.DTOS.CreateAnimalDTO;
+import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
 import com.example.naman.entities.Zoo;
 import com.example.naman.services.AnimalService;
@@ -30,16 +34,20 @@ public class AnimalController {
 	@Autowired
 	private ZooService zooService;
 	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/add")
-	public Animal saveAnimal(@RequestBody Animal animal) {
+	public ResponseEntity<AnimalResponseDTO> saveAnimal(@RequestBody CreateAnimalDTO animalDTO) {
 		
-		Zoo zoo = zooService.getZooById(animal.getZoo().getZooId());
-		if (zoo == null) {
-	        throw new RuntimeException("Zoo not found");
-	    }
+		ZooResponseDTO zooResponseDTO = zooService.getZooById(animalDTO.getZoo().getZooId());
+		Zoo zoo = modelMapper.map(zooResponseDTO, Zoo.class);
+		Animal animal = modelMapper.map(animalDTO, Animal.class);
 		animal.setZoo(zoo);
-		return animalService.addAnimal(animal);
+		AnimalResponseDTO animalResponseDTO  = animalService.addAnimal(animalDTO);
+		return ResponseEntity.ok(animalResponseDTO);
+				
 	}
 	
 	
@@ -52,25 +60,19 @@ public class AnimalController {
 	}
 	
 	@GetMapping("/zoo-ani/{id}")
-	public ResponseEntity<Page<Animal>> getAnimalsByZooId(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int size, @PathVariable Long id){
+	public ResponseEntity<Page<AnimalResponseDTO>> getAnimalsByZooId(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int size, @PathVariable Long id){
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Animal> animals = animalService.getAnimalByZooId(id, pageable);
+		Page<AnimalResponseDTO> animals = animalService.getAnimalByZooId(id, pageable);
 		return ResponseEntity.ok(animals);
 	}
 	
 	
 	
 	@GetMapping("/ani-id/{id}")
-	public ResponseEntity<?> getAnimalById(@PathVariable Long id)
+	public ResponseEntity<AnimalResponseDTO> getAnimalById(@PathVariable Long id)
 	{
-		Animal animal = animalService.getAnimalById(id);
+		return ResponseEntity.ok(animalService.getAnimalById(id));
 		
-		if(animal.isArchieved())
-		{
-			return ResponseEntity.status(404).body("Animal Not Found");
-		}
-		
-		return ResponseEntity.ok().body(animal);
 	}
 	
 	@PreAuthorize("hasRole('admin')")
@@ -83,9 +85,9 @@ public class AnimalController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@PatchMapping("/update/{id}")
-	public Animal updateAnimalDetail(@RequestBody Animal animal, @PathVariable Long id)
+	public ResponseEntity<AnimalResponseDTO> updateAnimalDetail(@RequestBody CreateAnimalDTO animal, @PathVariable Long id)
 	{
-		return animalService.updateAnimalById(animal, id);
+		return ResponseEntity.ok(animalService.updateAnimalById(animal, id));
 	}
 	
 }

@@ -5,13 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
-@NoArgsConstructor
+@Setter
 @AllArgsConstructor
-public class UserResponse {
-	private Long userId;
-    private String username;
-    private String token;
-    private String message;
+@NoArgsConstructor
+public class CreateAnimalDTO {
+	
+private String animalName;
+	
+	private String animalType;
+	
+	private ZooDTO zoo;
+
+	
 }

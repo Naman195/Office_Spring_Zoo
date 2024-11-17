@@ -4,15 +4,20 @@ import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.naman.DTOS.AddressDTO;
 import com.example.naman.DTOS.CreateZooDTO;
+import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Address;
+import com.example.naman.entities.City;
 import com.example.naman.entities.Zoo;
+import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.ZooRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,43 +28,71 @@ public class ZooService {
 	@Autowired
 	private  ZooRepository zooRepository; 
 	
+	@Autowired
+	private CityRepository cityRepository;
+	
+	@Autowired
+	private ModelMapper modelMapper;
+	
 	
 
-	public Zoo createZoo(Zoo zoo)
+	public void createZoo(CreateZooDTO zoo)
 	{
-//		Zoo newZoo = new Zoo();
-//		newZoo.setZooName(zoo.getZooName());
-//		AddressDTO addressDTO = zoo.getAddress();
-//		newZoo.setAddress(addressDTO);
+		Zoo newZoo = modelMapper.map(zoo, Zoo.class);
 //		
-		return zooRepository.save(zoo);
+		 zooRepository.save(newZoo);
 	}
 	
-	public Page<Zoo> getAllZoo(Pageable pageable) {
-		
-		return zooRepository.findByArchievedFalse(pageable);
+//	public Page<ZooResponseDTO> getAllZoo(Pageable pageable) {
+//		
+//		Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
+//		Page<ZooResponseDTO> dto = modelMapper.map(allZoo, Page<ZooResponseDTO>.class)
+//		return allZoo;
+//		
+//
+//	}
+	
+	public Page<ZooResponseDTO> getAllZoo(Pageable pageable)
+	{
+	    // Fetch all Zoo entities
+	    Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
 
+	    // Map the list of Zoo entities to a list of ZooResponseDTOs
+	    List<ZooResponseDTO> zooResponseDTOs = allZoo.getContent().stream()
+	            .map(zoo -> modelMapper.map(zoo, ZooResponseDTO.class))
+	            .collect(Collectors.toList());
+
+	    // Return a new Page with the DTOs
+	    return new PageImpl<>(zooResponseDTOs, pageable, allZoo.getTotalElements());
 	}
+
 	
-	public Zoo getZooById(Long id) {
-		return zooRepository.findById(id).orElseThrow(() -> new RuntimeException("Zoo not Found"));
+	public ZooResponseDTO getZooById(Long id)
+	{
+		Zoo zoo =  zooRepository.findById(id)
+				.filter(z -> !z.isArchieved())
+				.orElseThrow(() ->  new ResourceNotFoundException("Zoo not found with ID: " + id));
+		return modelMapper.map(zoo, ZooResponseDTO.class);
+		
 	}
 	
 	public void deleteZooById(Long id) {
-		Zoo zoo = zooRepository.findById(id).orElseThrow(() -> new RuntimeException("Zoo Not Found By Id"));
+		Zoo zoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
 		zoo.setArchieved(!zoo.isArchieved());
 		zooRepository.save(zoo);
 	}
 	
 	
-	public Zoo updateZooById(Zoo zoo, Long id)
+	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, Long id)
 	{
-		Zoo existingZoo = zooRepository.findById(id).orElseThrow(() -> new RuntimeException("Zoo Not Found By Id"));
-		existingZoo.setZooName(zoo.getZooName());
-		existingZoo.setAddress(zoo.getAddress());
-		existingZoo.setUpdatedBy(zoo.getUpdatedBy());
-		existingZoo.setUpdatedAt(zoo.getUpdatedAt());
-		return zooRepository.save(existingZoo);
+		Zoo existingZoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
+		modelMapper.map(updateZooDTO, existingZoo);
+		Long cityId = updateZooDTO.getAddress().getCity().getCityId();
+		City city = cityRepository.findById(cityId).orElseThrow(() -> new ResourceNotFoundException("City not found with ID: " + cityId));
+		existingZoo.getAddress().setCity(city);
+        Zoo updatedZoo = zooRepository.save(existingZoo);
+		
+		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}
 	
 	

@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.naman.DTOS.CreateZooDTO;
+import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Zoo;
 import com.example.naman.services.ZooService;
 
@@ -27,29 +29,24 @@ public class ZooController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/create-zoo")
-	public Zoo createZoo(@RequestBody Zoo zoo) {
-		return zooService.createZoo(zoo); 
+	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo) {
+		 zooService.createZoo(zoo); 
+		 return ResponseEntity.ok("Created");
 	}
 	
 	@GetMapping("/all")
-	public ResponseEntity<Page<Zoo>> getAllZoo(@RequestParam(defaultValue = "0") int page,  @RequestParam(defaultValue = "3") int size)
+	public ResponseEntity<Page<ZooResponseDTO>> getAllZoo(@RequestParam(defaultValue = "0") int page,  @RequestParam(defaultValue = "3") int size)
 	{
 		Pageable pageable = PageRequest.of(page, size);
-		Page<Zoo> zoos = zooService.getAllZoo(pageable);
+		Page<ZooResponseDTO> zoos = zooService.getAllZoo(pageable);
 		return ResponseEntity.ok(zoos);
 		
 	}
 	
 	
 	@GetMapping("/id/{id}")
-	public ResponseEntity<?> getZooById(@PathVariable Long id) {
-		Zoo zoo = zooService.getZooById(id);
-		
-		if(zoo.isArchieved()) {
-			return ResponseEntity.status(404).body("Zoo Not Found");
-		}
-		
-		return ResponseEntity.ok().body(zoo);
+	public ResponseEntity<ZooResponseDTO> getZooById(@PathVariable Long id) {
+		return ResponseEntity.ok(zooService.getZooById(id));
 	}
 	
 	@PreAuthorize("hasRole('admin')")
@@ -61,8 +58,9 @@ public class ZooController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@PatchMapping("/update/{id}")
-	public Zoo updateZoo(@RequestBody Zoo zoo, @PathVariable Long id) {
-		return zooService.updateZooById(zoo, id);
+	public ResponseEntity<ZooResponseDTO> updateZoo(@RequestBody CreateZooDTO zoo, @PathVariable Long id) {
+		return ResponseEntity.ok(zooService.updateZooById(zoo, id));
+//				zooService.updateZooById(zoo, id);
 	}
 	
 }

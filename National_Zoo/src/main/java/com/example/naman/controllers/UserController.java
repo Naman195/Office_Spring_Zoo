@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.example.naman.DTOS.CreateUserDTO;
 import com.example.naman.DTOS.CredentialsDTO;
+import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.User;
@@ -43,7 +46,7 @@ public class UserController {
 	
 	
 	  @PostMapping("/user/create")
-	    public ResponseEntity<String> createUser(@RequestBody User user) {
+	    public ResponseEntity<String> createUser(@RequestBody CreateUserDTO user) {
 	        try {
 	            userService.createUser(user);
 	            return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
@@ -74,18 +77,20 @@ public class UserController {
     }
 	
     @GetMapping("/allusers")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUser();
+    public ResponseEntity<List<ResponseUserDTO>> getAllUsers() {
+        List<ResponseUserDTO> users = userService.getAllUser();
         return ResponseEntity.ok(users);
     }
 	
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        try {
-            User user = userService.getUserById(id);
+    	try {
+            ResponseUserDTO user = userService.getUserById(id);
             return ResponseEntity.ok(user);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
         }
     }
 	

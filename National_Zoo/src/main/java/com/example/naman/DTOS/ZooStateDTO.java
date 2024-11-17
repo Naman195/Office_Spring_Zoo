@@ -11,12 +11,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class cityDTO {
+@NoArgsConstructor
 
-	@NotNull(message = "City Id is not  Null")
-	private Long cityId;
+public class ZooStateDTO {
+
+	@NotNull(message = "State Id is not  Null")
+	private Long stateId;
 	
-
+	private String stateName;
+	
+	@Valid
+	private ZooCountryDTO country;
 }

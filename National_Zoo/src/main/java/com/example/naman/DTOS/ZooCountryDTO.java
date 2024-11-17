@@ -1,8 +1,5 @@
 package com.example.naman.DTOS;
 
-import com.example.naman.entities.State;
-
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +8,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class cityDTO {
+@NoArgsConstructor
 
-	@NotNull(message = "City Id is not  Null")
-	private Long cityId;
+public class ZooCountryDTO {
+	
+	@NotNull(message = "Country Id is not  Null")
+	private Long countryId;
+	
+	private String countryName;
+	
 	
 
 }
