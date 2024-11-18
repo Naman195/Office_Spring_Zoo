@@ -22,7 +22,9 @@ public class RolesService {
 
 	public List<RoleResponseDTO> getRoles()
 	{
-		List<Roles> roles =  roleRepository.findAll(); 
+//		System.out.println("Hellodjkbfdjb");
+		List<Roles> roles =  roleRepository.findAll();
+//		System.out.println("Hellodjkbfdjb" + roles);
 		return roles.stream().map(role -> modelMapper.map(role, RoleResponseDTO.class)).collect(Collectors.toList());
 		
 		

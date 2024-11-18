@@ -51,8 +51,10 @@ public class User implements UserDetails {
 	@Column(name = "password", nullable = false)
 	private String password;
 	
-	@Column(name = "role", nullable = false)
-	private Roles role;
+//	@OneToOne(cascade=CascadeType.ALL)
+//	@JoinColumn(name = "role_id")
+	
+	private String role;
 	
 	@OneToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "address_id")
@@ -70,7 +72,8 @@ public class User implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.getRole()));
+//		System.out.println("Hello" +  role.getRole());
+		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
 	}
 
 	@Override
