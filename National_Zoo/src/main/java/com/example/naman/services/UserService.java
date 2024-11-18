@@ -22,8 +22,10 @@ import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.Address;
 import com.example.naman.entities.City;
+import com.example.naman.entities.Roles;
 import com.example.naman.entities.User;
 import com.example.naman.repositories.CityRepository;
+import com.example.naman.repositories.RoleRepository;
 import com.example.naman.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
@@ -49,13 +51,18 @@ public class UserService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	private RoleRepository roleRepository;
+	
 	@Transactional
 	public void createUser(CreateUserDTO userDTO) {
 		if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
 	        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 	    }
 		
+		
 		User user = modelMapper.map(userDTO, User.class);
+		Roles roles = roleRepository.findById(userDTO.getRole()).get();
+		user.setRole(roles);
 		String pass = bcryptPasswordEncoder.encode(userDTO.getPassword());
 		user.setPassword(pass);
 		userRepository.save(user);
@@ -106,7 +113,8 @@ public class UserService {
 	        .filter(user -> !user.isArchieved())
 	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + id + " not found"));
 	    
-	    return modelMapper.map(existingUser, ResponseUserDTO.class);
+	    ResponseUserDTO userDTo =  modelMapper.map(existingUser, ResponseUserDTO.class);
+	    return userDTo;
 	}
 	
 	public User findByUsername(String username) {
@@ -129,7 +137,7 @@ public class UserService {
 		
 	}
 	
-	 public User partialUpdateUserById(Long id, UpdateUserDTO dto) {
+	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto) {
 	        // Fetch user by ID
 	        User user = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -151,7 +159,9 @@ public class UserService {
 	            address.setCity(city);
 	        }
 
-	        return userRepository.save(user);
+	         userRepository.save(user);
+	         ResponseUserDTO res = modelMapper.map(user, ResponseUserDTO.class);
+	         return res;
 	    }
 	
 	 public void deleteUserById(Long id) {

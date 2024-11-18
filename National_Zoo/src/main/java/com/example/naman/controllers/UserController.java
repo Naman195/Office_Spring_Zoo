@@ -111,7 +111,7 @@ public class UserController {
     @PatchMapping("/userupdate/{id}")
     public ResponseEntity<?> partialUpdateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
         try {
-            User updatedUser = userService.partialUpdateUserById(id, updateUserDTO);
+        	ResponseUserDTO updatedUser = userService.partialUpdateUserById(id, updateUserDTO);
             return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partial update failed: " + e.getMessage());

@@ -22,6 +22,4 @@ public class NationalZooApplication {
 	    public AuditorAware<String> auditorProvider() {
 	        return new AuditorAwareImpl();
 	    }
-	
-
 }

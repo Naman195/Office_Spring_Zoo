@@ -39,7 +39,7 @@ public class SecurityConfiguration {
         .formLogin((form) -> form.disable())
         .logout((logout) -> logout.disable())
         .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/auth/user/login", "/api/auth/user/create", "/api/auth/countries", "/api/auth/state/*", "/api/auth/cities/*", "api/auth/forgotpassword")
+                        .requestMatchers("/api/auth/user/login", "/api/auth/user/create", "/api/auth/countries", "/api/auth/state/*", "/api/auth/cities/*", "/api/auth/forgotpassword", "/api/role/all")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
