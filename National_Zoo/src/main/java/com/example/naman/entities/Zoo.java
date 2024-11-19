@@ -59,7 +59,7 @@ public class Zoo {
 
 	@LastModifiedDate
 	@Column(name = "updated_at")
-	private String updatedAt;
+	private Instant updatedAt;
 	
 	@CreatedBy
 	@Column(name = "created_by", updatable = false)

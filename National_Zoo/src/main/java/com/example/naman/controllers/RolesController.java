@@ -23,7 +23,8 @@ public class RolesController {
 	@GetMapping("/all")
 	public ResponseEntity<List<RoleResponseDTO>> getRole()
 	{
-		return ResponseEntity.ok(rolesService.getRoles());
+		List<RoleResponseDTO> list = rolesService.getRoles();
+		return ResponseEntity.ok(list);
 	}
 
 }

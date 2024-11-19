@@ -37,10 +37,11 @@ public class Address {
 	@Column(name  = "address_id")
 	private Long addressId;
 	
+	@Column(nullable = false)
 	private String street;
 	
 	@Column(name = "zip_code")
-	private String zipCode;
+	private Long zipCode;
 	
 	
 		
@@ -51,6 +52,9 @@ public class Address {
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)
 	private Instant createdAt;
+	
+	@Column(name = "updated_at", updatable = true)
+	private String updatedAt;
 
 
 	@Column(name = "created_by")
@@ -62,6 +66,8 @@ public class Address {
 	public void func() {
 		archieved = false;
 	}
+	
+
 	  
 
 	

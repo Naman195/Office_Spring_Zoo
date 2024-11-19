@@ -20,7 +20,7 @@ public class AddressDTO {
 	@NotNull(message =  "Street name is not null")
 	private String street;
 	@NotNull(message =  "Zip Code  is not null")
-	private String zipCode;
+	private Long zipCode;
 	@Valid
 	private cityDTO city;
 }

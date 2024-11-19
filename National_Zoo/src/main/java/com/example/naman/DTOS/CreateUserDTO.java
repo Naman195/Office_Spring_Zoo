@@ -19,7 +19,7 @@ public class CreateUserDTO {
 	
 	private String password;
 	
-	private Long role;
+	private Long roleId;
 	
 	private AddressDTO address;
 }

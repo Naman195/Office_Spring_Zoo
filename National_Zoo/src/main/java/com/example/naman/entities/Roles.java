@@ -17,18 +17,14 @@ import lombok.Setter;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "role")
+@Table(name = "roles")
 public class Roles {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name  = "role_id")
-	private Long roleId;
-	
-	
-	private String role;
-	
-	
-
+	@Column(name  = "id")
+	private Long id;
+	@Column(name = "role_name")
+	private String roleName;
 	
 }

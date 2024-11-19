@@ -51,6 +51,7 @@ public class UserService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	@Autowired
 	private RoleRepository roleRepository;
 	
 	@Transactional
@@ -61,9 +62,9 @@ public class UserService {
 		
 		
 		User user = modelMapper.map(userDTO, User.class);
-		Roles roles = roleRepository.findById(userDTO.getRole()).get();
-		System.out.println("Rolesi d us" + userDTO.getRole());
-//		user.setRole(roles);
+		Roles roles = roleRepository.findById(userDTO.getRoleId()).get();
+//		System.out.println("Rolesi d us" + userDTO.getRole());
+		user.setRole(roles);
 		String pass = bcryptPasswordEncoder.encode(userDTO.getPassword());
 		user.setPassword(pass);
 		userRepository.save(user);
