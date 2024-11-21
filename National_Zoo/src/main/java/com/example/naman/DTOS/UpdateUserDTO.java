@@ -15,10 +15,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UpdateUserDTO {
 	
-	@NotNull(message =  "First name is not null")
-	private String firstName;
-	@NotNull(message =  "Last name is not null")
-	private String lastName;
+	@NotNull(message =  "Name is not null")
+	private String fullName;
+	@NotNull(message =  "Email is not null")
+	private String email;
 	@Valid
 	private AddressDTO address;
 }

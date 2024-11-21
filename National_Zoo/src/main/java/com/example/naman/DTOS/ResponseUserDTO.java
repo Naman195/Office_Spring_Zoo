@@ -13,9 +13,9 @@ public class ResponseUserDTO {
 	
 	private Long userId;
 
-	private String firstName;
+	private String fullName;
 	
-	private String lastName;
+	private String email;
 	
 	private String username;
 	

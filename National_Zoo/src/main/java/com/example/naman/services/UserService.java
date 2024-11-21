@@ -1,7 +1,6 @@
 package com.example.naman.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -10,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AddressDTO;
@@ -129,8 +126,8 @@ public class UserService {
 		User existingUser = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 		
-		existingUser.setFirstName(user.getFirstName());
-		existingUser.setLastName(user.getLastName());
+		existingUser.setFullName(user.getFullName());
+		existingUser.setEmail(user.getEmail());
 		existingUser.setUserName(user.getUsername());
 		existingUser.setPassword(user.getPassword());
 		existingUser.setAddress(user.getAddress());
@@ -145,8 +142,8 @@ public class UserService {
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
 	        // Update user fields
-	        user.setFirstName(dto.getFirstName());
-	        user.setLastName(dto.getLastName());
+	        user.setFullName(dto.getFullName());
+	        user.setEmail(dto.getEmail());
 
 	        // Update address fields
 	        Address address = user.getAddress();

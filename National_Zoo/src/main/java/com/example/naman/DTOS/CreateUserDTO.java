@@ -11,9 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateUserDTO {
 
-	private String firstName;
+	private String fullName;
 	
-	private String lastName;
+	private String email;
 	
 	private String userName;
 	

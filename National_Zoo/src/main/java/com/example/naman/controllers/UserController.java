@@ -26,6 +26,7 @@ import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.User;
+import com.example.naman.services.JavaSmtpGmailSenderService;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.UserService;
 
@@ -42,6 +43,10 @@ public class UserController {
 	
 	@Autowired
 	private JwtService jwtService;
+	
+
+	@Autowired
+	 private JavaSmtpGmailSenderService senderService;
 	
 	
 	
@@ -134,6 +139,8 @@ public class UserController {
     public ResponseEntity<String> forgotPassword(@RequestBody String username) {
         try {
             String url = userService.forgotPassword(username);
+  	 	  senderService.sendEmail("amanarora19599@gmail.com","Reset Password","Reset Password Url" + url);
+
             return ResponseEntity.ok(url);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Forgot password request failed: " + e.getMessage());
