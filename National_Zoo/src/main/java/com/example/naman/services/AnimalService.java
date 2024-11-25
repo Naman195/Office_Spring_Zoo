@@ -90,5 +90,9 @@ public class AnimalService {
 	
 	}
 	
+	 public List<Animal> searchByNameOrType(String searchTerm, Long zooId) {
+	        return animalRepository.findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
+	                searchTerm, searchTerm, zooId);
+	    }
 	
 }

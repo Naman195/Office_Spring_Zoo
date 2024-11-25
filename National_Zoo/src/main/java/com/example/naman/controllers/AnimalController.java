@@ -1,5 +1,7 @@
 package com.example.naman.controllers;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -90,4 +92,8 @@ public class AnimalController {
 		return ResponseEntity.ok(animalService.updateAnimalById(animal, id));
 	}
 	
+	 @GetMapping("/search")
+	    public List<Animal> searchByNameOrType(@RequestParam String searchTerm, @RequestParam Long zooId) {
+	        return animalService.searchByNameOrType(searchTerm, zooId);
+	    }
 }

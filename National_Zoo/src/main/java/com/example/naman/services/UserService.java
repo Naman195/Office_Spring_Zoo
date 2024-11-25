@@ -1,11 +1,14 @@
 package com.example.naman.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,6 +27,7 @@ import com.example.naman.entities.User;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.RoleRepository;
 import com.example.naman.repositories.UserRepository;
+import com.example.naman.utils.OtpHelper;
 
 import jakarta.transaction.Transactional;
 
@@ -50,6 +54,12 @@ public class UserService {
 	
 	@Autowired
 	private RoleRepository roleRepository;
+	
+	@Autowired
+	private OtpHelper otpHelper;
+	
+	@Autowired
+	 private JavaSmtpGmailSenderService senderService;
 	
 	@Transactional
 	public void createUser(CreateUserDTO userDTO) {
@@ -137,15 +147,15 @@ public class UserService {
 	}
 	
 	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto) {
-	        // Fetch user by ID
+	        
 	        User user = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-	        // Update user fields
+	        
 	        user.setFullName(dto.getFullName());
 	        user.setEmail(dto.getEmail());
 
-	        // Update address fields
+	      
 	        Address address = user.getAddress();
 	        AddressDTO addressDTO = dto.getAddress();
 	        
@@ -164,7 +174,6 @@ public class UserService {
 	    }
 	
 	 public void deleteUserById(Long id) {
-	        // Fetch and toggle the archived status
 	        User user = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	        
@@ -172,21 +181,43 @@ public class UserService {
 	        userRepository.save(user);
 	    }
 	
-	 public String forgotPassword(String username) {
-	        // Fetch user by username
-	        User user = userRepository.findByuserName(username)
-	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username is not valid"));
+	 public ResponseEntity<Map<String, String>> forgotPassword(String email) {
+	        User user = userRepository.findByEmail(email)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email is not valid"));
 
-	        // Generate forgot password token
-	        String forgotPasswordToken = jwtService.generateToken(user);
-
-	        // Construct the URL for resetting the password
-	        return "http://localhost:3000/setpass?token=" + forgotPasswordToken;
+	        String otp = otpHelper.generateOtp();
+	        otpHelper.storeOtp(user.getEmail(), otp);
+	       
+	        senderService.sendEmail(user.getEmail(), "Your Otp Code", "Your OTP code is: " + otp);
+	        
+	        Map<String, String> response = new HashMap<>();
+	        response.put("email", user.getEmail());
+	        response.put("message", "OTP sent to your email");
+	        
+	        return ResponseEntity.ok(response);
 	    }
+	 
+	 public ResponseEntity<Map<String, String>> verifyOtp(String email, String otp){
+		  
+		 boolean isValid = 	otpHelper.validateOtp(email, otp);
+		 
+		 if(isValid) {
+			 User user = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found"));
+			 
+			 String forgotPasswordToken = jwtService.generateToken(user);
+		        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
+		        
+		        Map<String, String> response = new HashMap<>();
+		        response.put("message", "OTP verified successfully");
+		        response.put("url", resetPasswordUrl);
+		        return ResponseEntity.ok(response);
+		    } else {
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message" ,"Invalid or expired OTP"));
+		    }
+		 
+	 }
 	
-	
-	
-
+	 
 	
 	public String setPassword(String tokenHeader, String newPassword) {
         // Validate the token

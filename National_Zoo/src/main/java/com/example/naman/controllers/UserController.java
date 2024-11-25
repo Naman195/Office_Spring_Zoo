@@ -1,6 +1,7 @@
 package com.example.naman.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.CreateUserDTO;
 import com.example.naman.DTOS.CredentialsDTO;
+import com.example.naman.DTOS.ForgotPasswordRequestDTO;
+import com.example.naman.DTOS.OtpResponseDTO;
 import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
@@ -55,8 +58,14 @@ public class UserController {
 	        try {
 	            userService.createUser(user);
 	            return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
-	        } catch (Exception e) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User creation failed: " + e.getMessage());
+	        } catch (ResponseStatusException e) {
+	        	String errorMessage = e.getReason();
+	            
+	            UserResponse errorResponse = new UserResponse();
+	            
+	            errorResponse.setMessage(errorMessage); 
+	        	
+	            return ResponseEntity.status(e.getStatusCode()).body(errorMessage);
 	        }
 	    }
 	
@@ -70,14 +79,17 @@ public class UserController {
             String jwtToken = jwtService.generateToken(user);
             authenticatedUser.setToken(jwtToken);
             return ResponseEntity.ok(authenticatedUser);
-        } catch (Exception e) {
+        } catch (ResponseStatusException e) {
+        	
+        	String errorMessage = e.getReason();
            
             UserResponse errorResponse = new UserResponse();
             
-            errorResponse.setMessage(e.getMessage()); 
+            errorResponse.setMessage(errorMessage); 
+//            System.out.println(errorResponse.toString());
             
           
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
         }
     }
 	
@@ -136,15 +148,27 @@ public class UserController {
 
 
     @PostMapping("/forgotpassword")
-    public ResponseEntity<String> forgotPassword(@RequestBody String username) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody ForgotPasswordRequestDTO request) {
         try {
-            String url = userService.forgotPassword(username);
-  	 	  senderService.sendEmail("amanarora19599@gmail.com","Reset Password","Reset Password Url" + url);
+        	ResponseEntity<Map<String, String>> response = userService.forgotPassword(request.getEmail());
+        	return response;
 
-            return ResponseEntity.ok(url);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Forgot password request failed: " + e.getMessage());
+        	return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "Forgot password request failed: " + e.getMessage()));
         }
+    }
+    
+    @PostMapping("/verifyotp")
+    public ResponseEntity<Map<String, String>> validateOtp(@RequestBody OtpResponseDTO request) {
+    	try {
+    		return (userService.verifyOtp(request.getEmail(), request.getOtp()));
+//			return userService.verifyOtp(request.getEmail(), request.getOtp());
+		} catch (Exception e) {
+			// TODO: handle exception
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","Otp Verification FAiled: " + e.getMessage()));
+		}
+    	
     }
 	
     @PostMapping("/setpassword")

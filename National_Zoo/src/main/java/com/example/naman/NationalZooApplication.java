@@ -29,9 +29,9 @@ public class NationalZooApplication {
 	        return new AuditorAwareImpl();
 	    }
 	 	
-	 	@EventListener(ApplicationReadyEvent.class)
-	 	 public void sendMail(){
-	 	  senderService.sendEmail("amanarora19599@gmail.com","This is subject","This is email body");
-	 	 }
+//	 	@EventListener(ApplicationReadyEvent.class)
+//	 	 public void sendMail(){
+//	 	  senderService.sendEmail("amanarora19599@gmail.com","This is subject","This is email body");
+//	 	 }
 
 }

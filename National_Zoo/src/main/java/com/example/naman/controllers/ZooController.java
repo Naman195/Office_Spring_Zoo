@@ -1,5 +1,7 @@
 package com.example.naman.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Zoo;
+import com.example.naman.repositories.ZooRepository;
 import com.example.naman.services.ZooService;
 
 @RestController
@@ -30,8 +34,12 @@ public class ZooController {
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/create-zoo")
 	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo) {
-		 zooService.createZoo(zoo); 
-		 return ResponseEntity.ok("Created");
+		try {
+	        zooService.createZoo(zoo);
+	        return ResponseEntity.ok("Zoo created successfully!");
+	    } catch (ResponseStatusException e) {
+	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+	    }
 	}
 	
 	@GetMapping("/all")
@@ -62,5 +70,31 @@ public class ZooController {
 		return ResponseEntity.ok(zooService.updateZooById(zoo, id));
 //				zooService.updateZooById(zoo, id);
 	}
+	
+	 // Endpoint to search zoos by name
+    @GetMapping("/search/zoos/name")
+    public ResponseEntity<List<Zoo>> searchZoosByName(@RequestParam String name) {
+        List<Zoo> zoos = zooService.searchZoosByName(name);
+        return ResponseEntity.ok(zoos);
+    }
+    
+//    @GetMapping("/search/zoos/countryName")
+//    public ResponseEntity<List<Zoo>> searchZooByCountryName(@RequestParam String countryName){
+//    	return ResponseEntity.ok(zooService.searchZooByCountry(countryName));
+//    }
+    
+    @GetMapping("/search/zoos/location")
+    public ResponseEntity<List<Zoo>> searchZoosByLocation(
+            @RequestParam String country,
+            @RequestParam(required = false) String state,
+            @RequestParam(required = false) String city) {
+    	List<Zoo> zoos = zooService.searchZoosByLocation(country, state, city);
+        return ResponseEntity.ok(zoos);
+    }
+    
+    
+    
+    
+    
 	
 }

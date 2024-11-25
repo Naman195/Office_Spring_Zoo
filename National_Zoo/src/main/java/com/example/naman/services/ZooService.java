@@ -9,7 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AddressDTO;
 import com.example.naman.DTOS.CreateZooDTO;
@@ -38,19 +41,15 @@ public class ZooService {
 
 	public void createZoo(CreateZooDTO zoo)
 	{
-		Zoo newZoo = modelMapper.map(zoo, Zoo.class);
-//		
-		 zooRepository.save(newZoo);
+		try {
+	        Zoo newZoo = modelMapper.map(zoo, Zoo.class);
+	        zooRepository.save(newZoo);
+	    } catch (Exception e) {
+	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create zoo: " + e.getMessage());
+
+	    }
 	}
 	
-//	public Page<ZooResponseDTO> getAllZoo(Pageable pageable) {
-//		
-//		Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
-//		Page<ZooResponseDTO> dto = modelMapper.map(allZoo, Page<ZooResponseDTO>.class)
-//		return allZoo;
-//		
-//
-//	}
 	
 	public Page<ZooResponseDTO> getAllZoo(Pageable pageable)
 	{
@@ -95,6 +94,28 @@ public class ZooService {
 		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}
 	
+	public List<Zoo> searchZoosByName(String name) {
+        return zooRepository.findByZooNameContainingIgnoreCase(name);
+    }
+	
+//	public List<Zoo> searchZooByCountry(String countryName){
+//		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCase(countryName);
+//	}
+	
+	public List<Zoo> searchZoosByLocation(String country, String state, String city){
+    	if(city != null && !city.isEmpty()) {
+    		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(country, state, city);
+    	}
+    	
+    	else if(state != null && !state.isEmpty()) {
+    		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCase(country, state);
+    	} 
+    	else {
+    		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCase(country);
+    	}
+    	
+    	
+    }
 	
 	
 	
