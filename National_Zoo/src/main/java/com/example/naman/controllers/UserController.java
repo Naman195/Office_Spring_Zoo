@@ -26,6 +26,7 @@ import com.example.naman.DTOS.CredentialsDTO;
 import com.example.naman.DTOS.ForgotPasswordRequestDTO;
 import com.example.naman.DTOS.OtpResponseDTO;
 import com.example.naman.DTOS.ResponseUserDTO;
+import com.example.naman.DTOS.SetPasswordRequest;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.User;
@@ -162,10 +163,10 @@ public class UserController {
     @PostMapping("/verifyotp")
     public ResponseEntity<Map<String, String>> validateOtp(@RequestBody OtpResponseDTO request) {
     	try {
-    		return (userService.verifyOtp(request.getEmail(), request.getOtp()));
+    		return userService.verifyOtp(request.getEmail(), request.getOtp());
 //			return userService.verifyOtp(request.getEmail(), request.getOtp());
 		} catch (Exception e) {
-			// TODO: handle exception
+			
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","Otp Verification FAiled: " + e.getMessage()));
 		}
     	
@@ -173,12 +174,12 @@ public class UserController {
 	
     @PostMapping("/setpassword")
     public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader,
-                                              @RequestBody String newPassword) {
+                                              @RequestBody SetPasswordRequest request) {
         try {
-            String response = userService.setPassword(tokenHeader, newPassword);
+            String response = userService.setPassword(tokenHeader, request.getNewPassword(), request.getOldPassword());
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password update failed: " + e.getMessage());
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 		

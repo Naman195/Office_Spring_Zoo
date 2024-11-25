@@ -219,8 +219,13 @@ public class UserService {
 	
 	 
 	
-	public String setPassword(String tokenHeader, String newPassword) {
-        // Validate the token
+	public String setPassword(String tokenHeader, String newPassword, String oldPassword) {
+        
+		if(newPassword == null || newPassword.length() < 6) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters long");
+		}
+		
+		
         if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token format");
         }
@@ -228,10 +233,15 @@ public class UserService {
         String token = tokenHeader.substring(7);
         String username = jwtService.extractUsername(token);
         
-        // Fetch user by extracted username
+        
         User user = userRepository.findByuserName(username)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        if(oldPassword != null && !bcryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
+        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is incorrect");
+        }
+        
+        
         // Update the password
         user.setPassword(bcryptPasswordEncoder.encode(newPassword));
         userRepository.save(user);
