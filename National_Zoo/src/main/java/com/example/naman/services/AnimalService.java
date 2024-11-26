@@ -1,5 +1,7 @@
 package com.example.naman.services;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,9 +45,7 @@ public class AnimalService {
 	
 	public Page<Animal> getAllAnimals(Pageable pageable)
 	{
-		return animalRepository.findByArchievedFalse(pageable);
-		
-		
+		return animalRepository.findByArchievedFalse(pageable);	
 	}
 	
 	public Page<AnimalResponseDTO> getAnimalByZooId(Long id, Pageable pageable)
@@ -91,8 +91,18 @@ public class AnimalService {
 	}
 	
 	 public List<Animal> searchByNameOrType(String searchTerm, Long zooId) {
-	        return animalRepository.findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
+	        List<Animal> allAni =  animalRepository.findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
 	                searchTerm, searchTerm, zooId);
+	        List<Animal> allAnimalInZooByZooid = animalRepository.findByArchievedFalseAndZooZooId(zooId); 
+	        List<Animal> fnlList = new ArrayList<>();
+	        for(Animal ani: allAnimalInZooByZooid) {
+	        	if(allAni.contains(ani)) {
+	        		fnlList.add(ani);
+	        	}
+	        }
+	        
+	        return fnlList;
+	        
 	    }
-	
+
 }

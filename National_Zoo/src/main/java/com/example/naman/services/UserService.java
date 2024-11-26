@@ -241,8 +241,6 @@ public class UserService {
         	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is incorrect");
         }
         
-        
-        // Update the password
         user.setPassword(bcryptPasswordEncoder.encode(newPassword));
         userRepository.save(user);
 

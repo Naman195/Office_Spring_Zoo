@@ -68,10 +68,9 @@ public class ZooController {
 	@PatchMapping("/update/{id}")
 	public ResponseEntity<ZooResponseDTO> updateZoo(@RequestBody CreateZooDTO zoo, @PathVariable Long id) {
 		return ResponseEntity.ok(zooService.updateZooById(zoo, id));
-//				zooService.updateZooById(zoo, id);
 	}
 	
-	 // Endpoint to search zoos by name
+	 
     @GetMapping("/search/zoos/name")
     public ResponseEntity<List<Zoo>> searchZoosByName(@RequestParam String name) {
         List<Zoo> zoos = zooService.searchZoosByName(name);

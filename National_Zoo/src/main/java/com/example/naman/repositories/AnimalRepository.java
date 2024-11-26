@@ -11,6 +11,7 @@ import com.example.naman.entities.Animal;
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 	
 	Page<Animal> findByArchievedFalseAndZooZooId(Long id, Pageable pageable);
+	List<Animal> findByArchievedFalseAndZooZooId(Long id);
 	
 	Page<Animal> findByArchievedFalse(Pageable pageable);
 	
