@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AnimalResponseDTO;
 import com.example.naman.DTOS.CreateAnimalDTO;
@@ -104,5 +105,29 @@ public class AnimalService {
 	        return fnlList;
 	        
 	    }
+	 
+	 
+	 public List<ZooResponseDTO> getAllZooExceptCurrentZoo(Long id){
+		List<ZooResponseDTO> allZoo = zooRepository.findAllByZooIdNot(id)
+												.stream()
+												.map(zoo -> modelMapper.map(zoo, ZooResponseDTO.class)).collect(Collectors.toList());
+		
+			return allZoo;
+		 
+		 
+	 }
+	 
+	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
+		 
+		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException("AnimalId is not Valid"));
+		 
+		 Zoo zoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
+		 
+		 animal.setZoo(zoo);
+		 animalRepository.save(animal);
+		 return modelMapper.map(animal, AnimalResponseDTO.class);
+		 	 
+	 }
+	 
 
 }

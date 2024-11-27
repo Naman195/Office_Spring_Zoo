@@ -2,6 +2,7 @@ package com.example.naman.controllers;
 
 import java.util.List;
 
+import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -96,4 +97,16 @@ public class AnimalController {
 	    public List<Animal> searchByNameOrType(@RequestParam String searchTerm, @RequestParam Long zooId) {
 	        return animalService.searchByNameOrType(searchTerm, zooId);
 	    }
+	 
+	 @PreAuthorize("hasRole('admin')")
+	 @GetMapping("/zoo/{id}")
+	 public ResponseEntity<List<ZooResponseDTO>> findAllZoo(@PathVariable Long id){
+		 return ResponseEntity.ok(animalService.getAllZooExceptCurrentZoo(id));
+	 }
+	 
+	 @PreAuthorize("hasRole('admin')")
+	 @PatchMapping("/transfer/{animalId}/to/{newZooId}")
+	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalId, @PathVariable Long newZooId){
+		 return ResponseEntity.ok(animalService.transferAnimal(animalId, newZooId));
+	 }
 }
