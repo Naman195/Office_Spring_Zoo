@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AnimalResponseDTO;
 import com.example.naman.DTOS.CreateAnimalDTO;
+import com.example.naman.DTOS.TransferHistoryResponseDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
 import com.example.naman.entities.City;
@@ -176,17 +177,29 @@ public class AnimalService {
 	 }
 	 
 	 
-	 public ResponseEntity<?> animalTransferHistory(Long animalId){
-		 
-		 List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
-		 
-		 if (historyList.isEmpty()) {
-	            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No transfer history found for the animal");
-	        }
-		 
-		 return ResponseEntity.ok(historyList);
-		 
-	 }
+	 public ResponseEntity<?> animalTransferHistory(Long animalId) {
+		    List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
+
+		    if (historyList.isEmpty()) {
+		        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No transfer history found for the animal");
+		    }
+
+		    // Map entities to DTOs
+		    List<TransferHistoryResponseDTO> response = historyList.stream()
+		        .map(history -> new TransferHistoryResponseDTO(
+		            history.getId(),
+		            history.getAnimalId().getAnimalName(),
+		            history.getFromZoo().getZooName(),
+		            history.getToZoo().getZooName(),
+		            history.getUserId().getFullName(),
+		            history.getDate().toString()
+		        ))
+		        .toList();
+
+		    return ResponseEntity.ok(response);
+		}
+
+
 	 
 	
 }
