@@ -1,9 +1,16 @@
 package com.example.naman.entities;
 
 import java.sql.Date;
+import java.time.Instant;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,6 +29,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "transfer_history")
+@EntityListeners(AuditingEntityListener.class)
 public class TransferHistory {
 	
 	@Id
@@ -48,10 +56,14 @@ public class TransferHistory {
 	
 	private Date date;
 	
+	@CreationTimestamp
+	@CreatedDate
+	@Column(name = "created_at", updatable = false)
+	private Instant createdAt;
+	
+	@CreatedBy
+	@Column(name = "created_by", updatable = false)
+	private String createdBy;
 	
 	
-	
-	
-	
-
 }

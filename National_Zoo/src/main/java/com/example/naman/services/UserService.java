@@ -153,7 +153,7 @@ public class UserService {
 
 	        
 	        user.setFullName(dto.getFullName());
-	        user.setEmail(dto.getEmail());
+//	        user.setEmail(dto.getEmail());
 
 	      
 	        Address address = user.getAddress();

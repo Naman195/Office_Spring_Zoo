@@ -95,7 +95,7 @@ public class ZooService {
 	}
 	
 	public List<Zoo> searchZoosByName(String name) {
-        return zooRepository.findByZooNameContainingIgnoreCase(name);
+        return zooRepository.findByArchievedFalseAndZooNameContainingIgnoreCase(name);
     }
 	
 //	public List<Zoo> searchZooByCountry(String countryName){
@@ -104,14 +104,14 @@ public class ZooService {
 	
 	public List<Zoo> searchZoosByLocation(String country, String state, String city){
     	if(city != null && !city.isEmpty()) {
-    		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(country, state, city);
+    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(country, state, city);
     	}
     	
     	else if(state != null && !state.isEmpty()) {
-    		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCase(country, state);
+    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCase(country, state);
     	} 
     	else {
-    		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCase(country);
+    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCase(country);
     	}
     	
     	

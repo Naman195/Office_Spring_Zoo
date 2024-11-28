@@ -109,4 +109,10 @@ public class AnimalController {
 	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalId, @PathVariable Long newZooId){
 		 return ResponseEntity.ok(animalService.transferAnimal(animalId, newZooId));
 	 }
+	 
+	 @PreAuthorize("hasRole('admin')")
+	 @GetMapping("/history/{animalId}")
+	 public ResponseEntity<?> getAnimalTransferHistory(@PathVariable Long animalId) {
+	        return animalService.animalTransferHistory(animalId);
+	    }
 }

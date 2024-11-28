@@ -13,11 +13,11 @@ import com.example.naman.entities.Zoo;
 public interface ZooRepository extends JpaRepository<Zoo, Long> {
 	
 	Page<Zoo> findByArchievedFalse(Pageable pageable);
-	List<Zoo> findByZooNameContainingIgnoreCase(String zooName);
-	List<Zoo> findByAddress_City_State_Country_CountryNameContainingIgnoreCase(String countryName);
-	List<Zoo> findByAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCase(String countryName, String stateName);
+	List<Zoo> findByArchievedFalseAndZooNameContainingIgnoreCase(String zooName);
+	List<Zoo> findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCase(String countryName);
+	List<Zoo> findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCase(String countryName, String stateName);
 
-    List<Zoo> findByAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(
+    List<Zoo> findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(
             String countryName, String stateName, String cityName);
     
     List<Zoo> findAllByZooIdNot(Long id);

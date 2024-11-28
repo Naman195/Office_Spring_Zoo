@@ -17,8 +17,8 @@ public class UpdateUserDTO {
 	
 	@NotNull(message =  "Name is not null")
 	private String fullName;
-	@NotNull(message =  "Email is not null")
-	private String email;
+//	@NotNull(message =  "Email is not null")
+//	private String email;
 	@Valid
 	private AddressDTO address;
 }

@@ -1,15 +1,21 @@
 package com.example.naman.services;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,9 +24,12 @@ import com.example.naman.DTOS.CreateAnimalDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
 import com.example.naman.entities.City;
+import com.example.naman.entities.TransferHistory;
+import com.example.naman.entities.User;
 import com.example.naman.entities.Zoo;
 import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.AnimalRepository;
+import com.example.naman.repositories.TransferHistoryRepository;
 import com.example.naman.repositories.ZooRepository;
 
 @Service
@@ -34,6 +43,9 @@ public class AnimalService {
 	
 	@Autowired
 	private ZooRepository zooRepository;
+	
+	@Autowired
+	private TransferHistoryRepository transferHistoryRepository;
 	
 	public AnimalResponseDTO addAnimal(CreateAnimalDTO animal)
 	{
@@ -117,17 +129,64 @@ public class AnimalService {
 		 
 	 }
 	 
+//	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
+//		 
+//		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException("AnimalId is not Valid"));
+//		 
+//		 Zoo zoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
+//		 
+//		 animal.setZoo(zoo);
+//		 animalRepository.save(animal);
+//		 return modelMapper.map(animal, AnimalResponseDTO.class);
+//		 	 
+//	 }
+	 
 	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
 		 
 		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException("AnimalId is not Valid"));
 		 
-		 Zoo zoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
+		 Zoo newZoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
 		 
-		 animal.setZoo(zoo);
+		 Zoo currentZoo = animal.getZoo(); // get CurrentZoo when Animal Belongs.
+		 
+		 animal.setZoo(newZoo);
 		 animalRepository.save(animal);
+		 
+		 TransferHistory transferHistory = new TransferHistory();
+		 
+		 transferHistory.setAnimalId(animal);
+		 transferHistory.setFromZoo(currentZoo);
+		 transferHistory.setToZoo(newZoo);
+		 
+		 // get Current loggedIn User from Security Context
+		 
+		 
+		 User currentUser  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 
+		 transferHistory.setUserId(currentUser);
+		 
+		 transferHistory.setDate(new Date(System.currentTimeMillis()));
+		 
+		 transferHistoryRepository.save(transferHistory);
+		 
+		 
 		 return modelMapper.map(animal, AnimalResponseDTO.class);
-		 	 
+		 
+			 
 	 }
 	 
-
+	 
+	 public ResponseEntity<?> animalTransferHistory(Long animalId){
+		 
+		 List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
+		 
+		 if (historyList.isEmpty()) {
+	            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No transfer history found for the animal");
+	        }
+		 
+		 return ResponseEntity.ok(historyList);
+		 
+	 }
+	 
+	
 }
