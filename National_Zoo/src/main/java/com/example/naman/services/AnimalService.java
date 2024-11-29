@@ -68,12 +68,12 @@ public class AnimalService {
 		Page<Animal> allanimalsInZoo =  animalRepository.findByArchievedFalseAndZooZooId(id, pageable);
 		
 		
-		// Map the list of Animals entities to a list of AnimalResponseDTOs
+		
 	    List<AnimalResponseDTO> animalResponseDTOs = allanimalsInZoo.getContent().stream()
 	            .map(animal -> modelMapper.map(animal, AnimalResponseDTO.class))
 	            .collect(Collectors.toList());
 
-	    // Return a new Page with the DTOs
+	   
 	    return new PageImpl<>(animalResponseDTOs, pageable, allanimalsInZoo.getTotalElements());
 		
 	}
@@ -114,7 +114,6 @@ public class AnimalService {
 	        		fnlList.add(ani);
 	        	}
 	        }
-	        
 	        return fnlList;
 	        
 	    }
@@ -181,7 +180,7 @@ public class AnimalService {
 		    List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
 
 		    if (historyList.isEmpty()) {
-		        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No transfer history found for the animal");
+		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Transfer Hisory Found for this Animal");
 		    }
 
 		    // Map entities to DTOs

@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class OtpHelper {
-
 	private static final long OTP_LEN = 5;
-	private static final long EXPIRATION_TIME_In_MilliSec = 5*60*1000;
+	private static final long EXPIRATION_TIME_IN_MILLISEC = 5*60*1000;
 	
 	private final Map<String, OtpEntry> otpStore = new HashMap<>();
 	
@@ -21,13 +20,12 @@ public class OtpHelper {
 		
 		public OtpEntry(String otp) {
 			this.otp = otp;
-			this.expirationTime = System.currentTimeMillis() + EXPIRATION_TIME_In_MilliSec;
+			this.expirationTime = System.currentTimeMillis() + EXPIRATION_TIME_IN_MILLISEC;
 		}
 		
 		boolean isExpired() {
 			return System.currentTimeMillis() > expirationTime;
 		}
-		
 	}
 	
 	public String generateOtp() {
@@ -45,7 +43,6 @@ public class OtpHelper {
 		otpStore.put(email, new OtpEntry(otp));
 	}
 	
-	
 	public boolean validateOtp(String email, String otp) {
 		OtpEntry entry = otpStore.get(email);
 		
@@ -59,6 +56,4 @@ public class OtpHelper {
 	public void removedExpiredOtps() {
 		otpStore.entrySet().removeIf(entry -> entry.getValue().isExpired());
 	}
-	
-	
 }
