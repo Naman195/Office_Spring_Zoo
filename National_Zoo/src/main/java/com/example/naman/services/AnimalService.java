@@ -2,11 +2,9 @@ package com.example.naman.services;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,17 +12,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AnimalResponseDTO;
 import com.example.naman.DTOS.CreateAnimalDTO;
 import com.example.naman.DTOS.TransferHistoryResponseDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
-import com.example.naman.entities.City;
 import com.example.naman.entities.TransferHistory;
 import com.example.naman.entities.User;
 import com.example.naman.entities.Zoo;
@@ -147,7 +142,7 @@ public class AnimalService {
 		 
 		 Zoo newZoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
 		 
-		 Zoo currentZoo = animal.getZoo(); // get CurrentZoo when Animal Belongs.
+		 Zoo currentZoo = animal.getZoo(); // get CurrentZoo where Animal Belongs.
 		 
 		 animal.setZoo(newZoo);
 		 animalRepository.save(animal);

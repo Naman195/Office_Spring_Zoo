@@ -66,11 +66,8 @@ public class UserService {
 		if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
 	        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 	    }
-		
-		
 		User user = modelMapper.map(userDTO, User.class);
 		Roles roles = roleRepository.findById(userDTO.getRoleId()).get();
-//		System.out.println("Rolesi d us" + userDTO.getRole());
 		user.setRole(roles);
 		String pass = bcryptPasswordEncoder.encode(userDTO.getPassword());
 		user.setPassword(pass);
@@ -108,14 +105,6 @@ public class UserService {
 		
 	}
 	
-
-	
-//	public ResponseUserDTO getUserById(Long id) {
-//	    User existingUser =  userRepository.findById(id)
-//	        .filter(user -> !user.isArchieved())
-//	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-//	    return modelMapper.map(existingUser, ResponseUserDTO.class);
-//	}
 	
 	public ResponseUserDTO getUserById(Long id) {
 	    User existingUser = userRepository.findById(id)
@@ -153,9 +142,6 @@ public class UserService {
 
 	        
 	        user.setFullName(dto.getFullName());
-//	        user.setEmail(dto.getEmail());
-
-	      
 	        Address address = user.getAddress();
 	        AddressDTO addressDTO = dto.getAddress();
 	        

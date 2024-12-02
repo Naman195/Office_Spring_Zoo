@@ -130,7 +130,7 @@ public class UserController {
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		try {
 			userService.deleteUserById(id);
-			return ResponseEntity.ok("User status toggled successfully");
+			return ResponseEntity.ok("User deleted successfully");
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User deletion failed: " + e.getMessage());
 		}

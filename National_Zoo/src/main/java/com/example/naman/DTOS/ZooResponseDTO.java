@@ -16,5 +16,6 @@ public class ZooResponseDTO {
 	private String zooName;
 	
 	private ZooAddressDTO address;
+	
 }
  
