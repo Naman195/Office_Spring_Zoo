@@ -53,15 +53,13 @@ public class ZooService {
 	
 	public Page<ZooResponseDTO> getAllZoo(Pageable pageable)
 	{
-	    // Fetch all Zoo entities
+	    
 	    Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
-
-	    // Map the list of Zoo entities to a list of ZooResponseDTOs
+	    
 	    List<ZooResponseDTO> zooResponseDTOs = allZoo.getContent().stream()
 	            .map(zoo -> modelMapper.map(zoo, ZooResponseDTO.class))
 	            .collect(Collectors.toList());
-
-	    // Return a new Page with the DTOs
+	    
 	    return new PageImpl<>(zooResponseDTOs, pageable, allZoo.getTotalElements());
 	}
 
@@ -72,7 +70,6 @@ public class ZooService {
 				.filter(z -> !z.isArchieved())
 				.orElseThrow(() ->  new ResourceNotFoundException("Zoo not found with ID: " + id));
 		return modelMapper.map(zoo, ZooResponseDTO.class);
-		
 	}
 	
 	public void deleteZooById(Long id) {
@@ -80,7 +77,6 @@ public class ZooService {
 		zoo.setArchieved(!zoo.isArchieved());
 		zooRepository.save(zoo);
 	}
-	
 	
 	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, Long id)
 	{
@@ -98,9 +94,6 @@ public class ZooService {
         return zooRepository.findByArchievedFalseAndZooNameContainingIgnoreCase(name);
     }
 	
-//	public List<Zoo> searchZooByCountry(String countryName){
-//		return zooRepository.findByAddress_City_State_Country_CountryNameContainingIgnoreCase(countryName);
-//	}
 	
 	public List<Zoo> searchZoosByLocation(String country, String state, String city){
     	if(city != null && !city.isEmpty()) {
@@ -113,7 +106,6 @@ public class ZooService {
     	else {
     		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCase(country);
     	}
-    	
     	
     }
 	

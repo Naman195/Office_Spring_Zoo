@@ -20,5 +20,5 @@ public interface ZooRepository extends JpaRepository<Zoo, Long> {
     List<Zoo> findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(
             String countryName, String stateName, String cityName);
     
-    List<Zoo> findAllByZooIdNot(Long id);
+    List<Zoo> findAllByZooIdNotAndArchievedFalse(Long id);
 }

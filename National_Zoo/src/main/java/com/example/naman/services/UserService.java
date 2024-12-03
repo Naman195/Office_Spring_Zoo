@@ -66,6 +66,11 @@ public class UserService {
 		if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
 	        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 	    }
+		
+		if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+		}
+		
 		User user = modelMapper.map(userDTO, User.class);
 		Roles roles = roleRepository.findById(userDTO.getRoleId()).get();
 		user.setRole(roles);

@@ -21,7 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Zoo;
-import com.example.naman.repositories.ZooRepository;
 import com.example.naman.services.ZooService;
 
 @RestController
@@ -77,10 +76,6 @@ public class ZooController {
         return ResponseEntity.ok(zoos);
     }
     
-//    @GetMapping("/search/zoos/countryName")
-//    public ResponseEntity<List<Zoo>> searchZooByCountryName(@RequestParam String countryName){
-//    	return ResponseEntity.ok(zooService.searchZooByCountry(countryName));
-//    }
     
     @GetMapping("/search/zoos/location")
     public ResponseEntity<List<Zoo>> searchZoosByLocation(

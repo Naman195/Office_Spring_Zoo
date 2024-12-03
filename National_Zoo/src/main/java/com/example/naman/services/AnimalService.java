@@ -115,7 +115,7 @@ public class AnimalService {
 	 
 	 
 	 public List<ZooResponseDTO> getAllZooExceptCurrentZoo(Long id){
-		List<ZooResponseDTO> allZoo = zooRepository.findAllByZooIdNot(id)
+		List<ZooResponseDTO> allZoo = zooRepository.findAllByZooIdNotAndArchievedFalse(id)
 												.stream()
 												.map(zoo -> modelMapper.map(zoo, ZooResponseDTO.class)).collect(Collectors.toList());
 		

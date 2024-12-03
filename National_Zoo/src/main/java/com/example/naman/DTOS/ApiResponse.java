@@ -1,5 +1,7 @@
 package com.example.naman.DTOS;
 
+import org.springframework.context.annotation.Configuration;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,10 +9,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Configuration
+public class ApiResponse {
 
-public class CategoryRepositoryDTO {
-	private Long categoryId;
-	private String categoryName;
+	private String message;
 }
