@@ -48,8 +48,7 @@ public class AnimalController {
 		Animal animal = modelMapper.map(animalDTO, Animal.class);
 		animal.setZoo(zoo);
 		AnimalResponseDTO animalResponseDTO  = animalService.addAnimal(animalDTO);
-		return ResponseEntity.ok(animalResponseDTO);
-				
+		return ResponseEntity.ok(animalResponseDTO);		
 	}
 	
 	
@@ -68,13 +67,10 @@ public class AnimalController {
 		return ResponseEntity.ok(animals);
 	}
 	
-	
-	
 	@GetMapping("/ani-id/{id}")
 	public ResponseEntity<AnimalResponseDTO> getAnimalById(@PathVariable Long id)
 	{
 		return ResponseEntity.ok(animalService.getAnimalById(id));
-		
 	}
 	
 	@PreAuthorize("hasRole('admin')")

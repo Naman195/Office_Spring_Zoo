@@ -18,5 +18,4 @@ public class CityService {
 		return cityRepository.findByStateStateId(id);
 	}
 	
-	
 }

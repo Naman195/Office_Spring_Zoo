@@ -75,8 +75,7 @@ public class ZooController {
         List<Zoo> zoos = zooService.searchZoosByName(name);
         return ResponseEntity.ok(zoos);
     }
-    
-    
+       
     @GetMapping("/search/zoos/location")
     public ResponseEntity<List<Zoo>> searchZoosByLocation(
             @RequestParam String country,
@@ -86,9 +85,4 @@ public class ZooController {
         return ResponseEntity.ok(zoos);
     }
     
-    
-    
-    
-    
-	
 }

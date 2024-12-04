@@ -19,6 +19,7 @@ import com.example.naman.repositories.UserRepository;
  * @version 1.0.0
  * @since 29-Nov-2024
  */
+
 @Configuration
 public class ApplicationConfiguration {
 	

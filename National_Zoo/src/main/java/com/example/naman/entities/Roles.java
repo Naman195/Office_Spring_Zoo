@@ -24,6 +24,7 @@ public class Roles {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name  = "id")
 	private Long id;
+	
 	@Column(name = "role_name")
 	private String roleName;
 	

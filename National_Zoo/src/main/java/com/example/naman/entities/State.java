@@ -14,12 +14,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-
 @Entity
 public class State {
 
@@ -30,7 +26,6 @@ public class State {
 	
 	@Column(name = "state_name", nullable = false)
 	private String stateName;
-	
 	
 	@ManyToOne
 	@JoinColumn(name = "country_id", nullable = false)

@@ -18,6 +18,4 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
 	List<Animal> findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
             String animalName, String animalType, Long zooId);
 	
-	
-
 }

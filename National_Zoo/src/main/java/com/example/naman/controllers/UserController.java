@@ -76,9 +76,6 @@ public class UserController {
 			UserResponse errorResponse = new UserResponse();
 
 			errorResponse.setMessage(errorMessage); 
-			//            System.out.println(errorResponse.toString());
-
-
 			return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
 		}
 	}
@@ -101,7 +98,6 @@ public class UserController {
 		}
 	}
 
-
 	@PreAuthorize("hasRole('admin')")
 	@PutMapping("/user/update/{id}")
 	public ResponseEntity<?> updateUserById(@Valid @RequestBody User user, @PathVariable Long id) {
@@ -113,7 +109,7 @@ public class UserController {
 		}
 	}
 
-	// Partial Update User
+	
 	@PreAuthorize("hasRole('admin')")
 	@PatchMapping("/userupdate/{id}")
 	public ResponseEntity<?> partialUpdateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
@@ -142,10 +138,10 @@ public class UserController {
 		try {
 			ResponseEntity<Map<String, String>> response = userService.forgotPassword(request.getEmail());
 			return response;
-
 		} catch (Exception e) {
+			
 			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", "Forgot password request failed: " + e.getMessage()));
+					.body(Map.of("message", e.getMessage()));
 		}
 	}
 
@@ -153,12 +149,9 @@ public class UserController {
 	public ResponseEntity<Map<String, String>> validateOtp(@RequestBody OtpResponseDTO request) {
 		try {
 			return userService.verifyOtp(request.getEmail(), request.getOtp());
-			//			return userService.verifyOtp(request.getEmail(), request.getOtp());
 		} catch (Exception e) {
-
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","Otp Verification FAiled: " + e.getMessage()));
 		}
-
 	}
 
 	@PostMapping("/setpassword")

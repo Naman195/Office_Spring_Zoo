@@ -6,20 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.naman.entities.State;
-import com.example.naman.repositories.CountryRepository;
 import com.example.naman.repositories.StateRepository;
-
-import lombok.RequiredArgsConstructor;
-
-
 
 @Service
 public class StateService {
-
 	
 	@Autowired
 	private StateRepository stateRepository;
-	
 
 	public List<State> getStatesByCountryId(Long id)
 	{

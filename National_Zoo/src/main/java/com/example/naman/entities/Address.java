@@ -42,8 +42,6 @@ public class Address {
 	
 	@Column(name = "zip_code")
 	private Long zipCode;
-	
-	
 		
 	@ManyToOne
 	@JoinColumn(name = "city_id", nullable = false)
@@ -56,19 +54,13 @@ public class Address {
 	@Column(name = "updated_at", updatable = true)
 	private String updatedAt;
 
-
 	@Column(name = "created_by")
 	private String createdBy;
 	 
-	
 	private Boolean archieved;
 	@PrePersist
 	public void func() {
 		archieved = false;
 	}
-	
-
-	  
-
 	
 }
