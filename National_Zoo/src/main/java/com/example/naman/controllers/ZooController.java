@@ -70,18 +70,25 @@ public class ZooController {
 	}
 	
 	 
-    @GetMapping("/search/zoos/name")
-    public ResponseEntity<List<Zoo>> searchZoosByName(@RequestParam String name) {
-        List<Zoo> zoos = zooService.searchZoosByName(name);
-        return ResponseEntity.ok(zoos);
-    }
+//    @GetMapping("/search/zoos/name")
+//    public ResponseEntity<List<Zoo>> searchZoosByName(@RequestParam String name) {
+//        List<Zoo> zoos = zooService.searchZoosByName(name);
+//        return ResponseEntity.ok(zoos);
+//    }
        
-    @GetMapping("/search/zoos/location")
+//    @GetMapping("/search/zoos/location")
+//    public ResponseEntity<List<Zoo>> searchZoosByLocation(
+//            @RequestParam String country,
+//            @RequestParam(required = false) String state,
+//            @RequestParam(required = false) String city) {
+//    	List<Zoo> zoos = zooService.searchZoosByLocation(country, state, city);
+//        return ResponseEntity.ok(zoos);
+//    }
+    
+    @GetMapping("/search")
     public ResponseEntity<List<Zoo>> searchZoosByLocation(
-            @RequestParam String country,
-            @RequestParam(required = false) String state,
-            @RequestParam(required = false) String city) {
-    	List<Zoo> zoos = zooService.searchZoosByLocation(country, state, city);
+            @RequestParam String query) {
+    	List<Zoo> zoos = zooService.searchZoosByLocation(query);
         return ResponseEntity.ok(zoos);
     }
     

@@ -138,10 +138,9 @@ public class UserController {
 		try {
 			ResponseEntity<Map<String, String>> response = userService.forgotPassword(request.getEmail());
 			return response;
-		} catch (Exception e) {
-			
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(Map.of("message", e.getMessage()));
+		} catch (ResponseStatusException e) {
+			String errorMessage = e.getReason();			
+			return ResponseEntity.status(e.getStatusCode()).body(Map.of("message", errorMessage));
 		}
 	}
 
