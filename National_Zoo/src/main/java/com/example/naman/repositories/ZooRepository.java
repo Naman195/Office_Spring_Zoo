@@ -28,16 +28,23 @@ public interface ZooRepository extends JpaRepository<Zoo, Long> {
     
 //    List<Zoo> findByArchievedFalseAndZooNameOrAddress_City_State_Country_CountryNameContainingIgnoreCaseOrAddress_City_State_StateNameContainingIgnoreCaseOrAddress_City_CityNameContainingIgnoreCase(String query);
     
-//	@Query(value = 'select z from Zoo z Join Address a on z.address_id = a.address_id Join City c on a.city_id = c.city_id Join State s on c.state_id = s.state_id Join Country co on  s.country_id = co.country_id where LOWER(z.zooName) LIKE :query OR LOWER(c.cityName) LIKE :query OR LOWER(s.stateName) LIKE :query OR LOWER(co.countryName) LIKE :query' , nativeQuery = true)
-    @Query(value = 'select * from Zoo z Join Address a on z.address_id = a.address_id Join City c on a.city_id = c.city_id Join State s on c.state_id = s.state_id Join Country co on  s.country_id = co.country_id where lower(z.zoo_name) like :query or lower(c.city_name) like :query or lower(s.state_name) like :query or lower(co.country_name) like :query')
-	List<Zoo> findByZooSearch(@Param("query") String query);
+	 @Query("SELECT z FROM Zoo z " +
+	           "JOIN z.address a " +
+	           "JOIN a.city c " +
+	           "JOIN c.state s " +
+	           "JOIN s.country co " +
+	           "WHERE LOWER(z.zooName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+	           "OR LOWER(c.cityName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+	           "OR LOWER(s.stateName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
+	           "OR LOWER(co.countryName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
+	    List<Zoo> searchByZooNameOrLocation(@Param("searchTerm") String searchTerm);
     
 }
 
 
 
 //Sql WorkBench Query
-
+//
 //select * from zoo z 
 //join address a on z.address_id = a.address_id
 //join city c on a.city_id =  c.city_id

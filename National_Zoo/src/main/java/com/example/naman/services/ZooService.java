@@ -107,7 +107,7 @@ public class ZooService {
 //    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCase(country);
 //    	}
 		
-		return zooRepository.findByZooSearch(query);
+		return zooRepository.searchByZooNameOrLocation(query);
 
     }
 	
