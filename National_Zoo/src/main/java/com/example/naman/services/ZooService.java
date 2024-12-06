@@ -90,24 +90,13 @@ public class ZooService {
 		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}
 	
-//	public List<Zoo> searchZoosByName(String name) {
-//        return zooRepository.findByArchievedFalseAndZooNameContainingIgnoreCase(name);
-//    }
 	
-	
-	public List<Zoo> searchZoosByLocation(String query){
-//    	if(city != null && !city.isEmpty()) {
-//    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCaseAndAddress_City_CityNameContainingIgnoreCase(country, state, city);
-//    	}
-//    	
-//    	else if(state != null && !state.isEmpty()) {
-//    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCaseAndAddress_City_State_StateNameContainingIgnoreCase(country, state);
-//    	} 
-//    	else {
-//    		return zooRepository.findByArchievedFalseAndAddress_City_State_Country_CountryNameContainingIgnoreCase(country);
-//    	}
+	public List<ZooResponseDTO> searchByNameOrLocation(String searchItem){
 		
-		return zooRepository.searchByZooNameOrLocation(query);
+		List<Zoo> searchList =  zooRepository.searchByZooNameOrLocation(searchItem);
+	 List<ZooResponseDTO> searchDtoList = searchList.stream().map(search -> modelMapper.map(search, ZooResponseDTO.class)).collect(Collectors.toList());
+	 return searchDtoList;
+	 
 
     }
 	

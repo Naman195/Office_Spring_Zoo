@@ -14,8 +14,8 @@ public class CityService {
 	@Autowired
 	private CityRepository cityRepository;
 	
-	public List<City> getAllCitiesById(Long id){
-		return cityRepository.findByStateStateId(id);
+	public List<City> getAllCitiesByStateId(Long stateId){
+		return cityRepository.findByStateStateId(stateId);
 	}
 	
 }

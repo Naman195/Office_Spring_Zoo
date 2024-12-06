@@ -74,8 +74,8 @@ public class UserService {
 		User user = modelMapper.map(userDTO, User.class);
 		Roles roles = roleRepository.findById(userDTO.getRoleId()).get();
 		user.setRole(roles);
-		String pass = bcryptPasswordEncoder.encode(userDTO.getPassword());
-		user.setPassword(pass);
+		String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
+		user.setPassword(password);
 		userRepository.save(user);
 	}
 	
@@ -125,20 +125,7 @@ public class UserService {
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	    }
 	
-	public User UpdateUserById(User user,  Long id) {
 	
-		User existingUser = userRepository.findById(id)
-	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-		
-		existingUser.setFullName(user.getFullName());
-		existingUser.setEmail(user.getEmail());
-		existingUser.setUserName(user.getUsername());
-		existingUser.setPassword(user.getPassword());
-		existingUser.setAddress(user.getAddress());
-		return userRepository.save(existingUser);
-		
-		
-	}
 	
 	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto) {
 	        

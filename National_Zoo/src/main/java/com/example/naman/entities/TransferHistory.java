@@ -50,9 +50,10 @@ public class TransferHistory {
 	@JoinColumn(name="animal_id")
 	private Animal animalId;
 	
-	@ManyToOne
-	@JoinColumn(name="user_id")
-	private User userId;
+//	@ManyToOne
+//	@JoinColumn(name="username")
+	@Column(name = "username", unique = true)
+	private String userName;
 	
 	private Date date;
 	

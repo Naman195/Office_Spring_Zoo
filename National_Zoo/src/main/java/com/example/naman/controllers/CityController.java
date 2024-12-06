@@ -21,6 +21,6 @@ public class CityController {
 	@GetMapping("/cities/{cityId}")
 	public List<City> getAllCitiesByStateId(@PathVariable  Long cityId)
 	{
-		return cityService.getAllCitiesById(cityId);
+		return cityService.getAllCitiesByStateId(cityId);
 	}
 }

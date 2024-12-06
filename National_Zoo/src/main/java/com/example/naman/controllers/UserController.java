@@ -98,20 +98,10 @@ public class UserController {
 		}
 	}
 
-	@PreAuthorize("hasRole('admin')")
-	@PutMapping("/user/update/{id}")
-	public ResponseEntity<?> updateUserById(@Valid @RequestBody User user, @PathVariable Long id) {
-		try {
-			User updatedUser = userService.UpdateUserById(user, id);
-			return ResponseEntity.ok(updatedUser);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User update failed: " + e.getMessage());
-		}
-	}
 
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/userupdate/{id}")
+	@PatchMapping("/update/{id}")
 	public ResponseEntity<?> partialUpdateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
 		try {
 			ResponseUserDTO updatedUser = userService.partialUpdateUserById(id, updateUserDTO);
@@ -122,7 +112,7 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/user/delete/{id}")
+	@PatchMapping("/delete/{id}")
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		try {
 			userService.deleteUserById(id);

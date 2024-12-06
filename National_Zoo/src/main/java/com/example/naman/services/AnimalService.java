@@ -124,17 +124,6 @@ public class AnimalService {
 		 
 	 }
 	 
-//	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
-//		 
-//		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException("AnimalId is not Valid"));
-//		 
-//		 Zoo zoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
-//		 
-//		 animal.setZoo(zoo);
-//		 animalRepository.save(animal);
-//		 return modelMapper.map(animal, AnimalResponseDTO.class);
-//		 	 
-//	 }
 	 
 	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
 		 
@@ -155,10 +144,9 @@ public class AnimalService {
 		 
 		 // get Current loggedIn User from Security Context
 		 
-		 
 		 User currentUser  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		 
-		 transferHistory.setUserId(currentUser);
+		 transferHistory.setUserName(currentUser.getUsername());
 		 
 		 transferHistory.setDate(new Date(System.currentTimeMillis()));
 		 
@@ -177,7 +165,6 @@ public class AnimalService {
 		    if (historyList.isEmpty()) {
 		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Transfer Hisory Found for this Animal");
 		    }
-
 		    // Map entities to DTOs
 		    List<TransferHistoryResponseDTO> response = historyList.stream()
 		        .map(history -> new TransferHistoryResponseDTO(
@@ -185,7 +172,7 @@ public class AnimalService {
 		            history.getAnimalId().getAnimalName(),
 		            history.getFromZoo().getZooName(),
 		            history.getToZoo().getZooName(),
-		            history.getUserId().getFullName(),
+		            history.getUserName(),
 		            history.getDate().toString()
 		        ))
 		        .toList();
