@@ -31,7 +31,7 @@ public class ZooController {
 	private ZooService zooService;
 	
 	@PreAuthorize("hasRole('admin')")
-	@PostMapping("/create-zoo")
+	@PostMapping("/create")
 	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo) {
 		try {
 	        zooService.createZoo(zoo);
@@ -41,7 +41,7 @@ public class ZooController {
 	    }
 	}
 	
-	@GetMapping("/all")
+	@GetMapping("/allZoo")
 	public ResponseEntity<Page<ZooResponseDTO>> getAllZoo(@RequestParam(defaultValue = "0") int page,  @RequestParam(defaultValue = "3") int size)
 	{
 		Pageable pageable = PageRequest.of(page, size);
@@ -57,14 +57,14 @@ public class ZooController {
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/del/{id}")
+	@PatchMapping("/deleleZoo/{id}")
 	public String deleteZoo(@PathVariable Long id) {
 		zooService.deleteZooById(id);
 		return "Zoo Deleted SuccessFully";
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/update/{id}")
+	@PatchMapping("/updateZoo/{id}")
 	public ResponseEntity<ZooResponseDTO> updateZoo(@RequestBody CreateZooDTO zoo, @PathVariable Long id) {
 		return ResponseEntity.ok(zooService.updateZooById(zoo, id));
 	}

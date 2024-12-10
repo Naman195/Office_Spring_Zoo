@@ -40,7 +40,7 @@ public class AnimalController {
 	private ModelMapper modelMapper;
 	
 	@PreAuthorize("hasRole('admin')")
-	@PostMapping("/add")
+	@PostMapping("/addAnimal")
 	public ResponseEntity<AnimalResponseDTO> saveAnimal(@RequestBody CreateAnimalDTO animalDTO) {
 		
 		ZooResponseDTO zooResponseDTO = zooService.getZooById(animalDTO.getZoo().getZooId());
@@ -51,16 +51,7 @@ public class AnimalController {
 		return ResponseEntity.ok(animalResponseDTO);		
 	}
 	
-	
-	@GetMapping("/all-ani")
-	public ResponseEntity<Page<Animal>> getAllAnimals(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "4") int size)
-	{
-		Pageable pageable = PageRequest.of(page, size);
-		Page<Animal> animals = animalService.getAllAnimals(pageable);
-		return ResponseEntity.ok(animals);
-	}
-	
-	@GetMapping("/zoo-ani/{id}")
+	@GetMapping("/ZooAnimalsByZooId/{id}")
 	public ResponseEntity<Page<AnimalResponseDTO>> getAnimalsByZooId(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int size, @PathVariable Long id){
 		Pageable pageable = PageRequest.of(page, size);
 		Page<AnimalResponseDTO> animals = animalService.getAnimalByZooId(id, pageable);
@@ -74,7 +65,7 @@ public class AnimalController {
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/del/{id}")
+	@PatchMapping("/deleteAnimalById/{id}")
 	public String deleteAnimalById(@PathVariable Long id)
 	{
 		animalService.deletedAnimal(id);
@@ -82,8 +73,9 @@ public class AnimalController {
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/update/{id}")
+	@PatchMapping("/updateAnimal/{id}")
 	public ResponseEntity<AnimalResponseDTO> updateAnimalDetail(@RequestBody CreateAnimalDTO animal, @PathVariable Long id)
+	
 	{
 		return ResponseEntity.ok(animalService.updateAnimalById(animal, id));
 	}
@@ -94,13 +86,13 @@ public class AnimalController {
 	    }
 	 
 	 @PreAuthorize("hasRole('admin')")
-	 @GetMapping("/zoo/{id}")
+	 @GetMapping("/zooListByZooId/{id}")
 	 public ResponseEntity<List<ZooResponseDTO>> findAllZoo(@PathVariable Long id){
 		 return ResponseEntity.ok(animalService.getAllZooExceptCurrentZoo(id));
 	 }
 	 
 	 @PreAuthorize("hasRole('admin')")
-	 @PatchMapping("/transfer/{animalId}/to/{newZooId}")
+	 @PatchMapping("/transferAnimal/{animalId}/to/{newZooId}")
 	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalId, @PathVariable Long newZooId){
 		 return ResponseEntity.ok(animalService.transferAnimal(animalId, newZooId));
 	 }

@@ -94,7 +94,8 @@ public class ZooService {
 	public List<ZooResponseDTO> searchByNameOrLocation(String searchItem){
 		
 		List<Zoo> searchList =  zooRepository.searchByZooNameOrLocation(searchItem);
-	 List<ZooResponseDTO> searchDtoList = searchList.stream().map(search -> modelMapper.map(search, ZooResponseDTO.class)).collect(Collectors.toList());
+		List<Zoo> filteredZooList = searchList.stream().filter(zoo -> !zoo.isArchieved()).collect(Collectors.toList());
+	 List<ZooResponseDTO> searchDtoList = filteredZooList.stream().map(search -> modelMapper.map(search, ZooResponseDTO.class)).collect(Collectors.toList());
 	 return searchDtoList;
 	 
 
