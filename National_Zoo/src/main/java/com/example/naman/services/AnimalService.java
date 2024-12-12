@@ -173,7 +173,6 @@ public class AnimalService {
 		    animal.setAnimalId(transferredAnimalData.getAnimalId());	
 		    animal.setAnimalType(transferredAnimalData.getAnimalType());
 		    animal.setZoo(modelMapper.map(transferredAnimalData.getZoo(), ZooResponseDTO.class));
-//		    animal.setZoo(transferredAnimalData.getZoo());
 		    AnimalData_TransferHistoryDataDTO  ResponseDTO = new AnimalData_TransferHistoryDataDTO();
 		    ResponseDTO.setAnimalData(animal);
 		    // Map entities to DTOs
@@ -188,8 +187,6 @@ public class AnimalService {
 		        ))
 		        .toList();
 		    ResponseDTO.setTransferData(response);
-		    
-
 		    return ResponseEntity.ok(ResponseDTO);
 		}
 
