@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.example.naman.DTOS.AnimalData_TransferHistoryDataDTO;
 import com.example.naman.DTOS.AnimalResponseDTO;
 import com.example.naman.DTOS.CreateAnimalDTO;
 import com.example.naman.DTOS.TransferHistoryResponseDTO;
@@ -165,6 +166,16 @@ public class AnimalService {
 		    if (historyList.isEmpty()) {
 		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Transfer Hisory Found for this Animal");
 		    }
+		    
+		    AnimalResponseDTO animal = new AnimalResponseDTO();
+		    Animal transferredAnimalData = historyList.get(0).getAnimalId();
+		    animal.setAnimalName(transferredAnimalData.getAnimalName());
+		    animal.setAnimalId(transferredAnimalData.getAnimalId());	
+		    animal.setAnimalType(transferredAnimalData.getAnimalType());
+		    animal.setZoo(modelMapper.map(transferredAnimalData.getZoo(), ZooResponseDTO.class));
+//		    animal.setZoo(transferredAnimalData.getZoo());
+		    AnimalData_TransferHistoryDataDTO  ResponseDTO = new AnimalData_TransferHistoryDataDTO();
+		    ResponseDTO.setAnimalData(animal);
 		    // Map entities to DTOs
 		    List<TransferHistoryResponseDTO> response = historyList.stream()
 		        .map(history -> new TransferHistoryResponseDTO(
@@ -176,8 +187,10 @@ public class AnimalService {
 		            history.getDate().toString()
 		        ))
 		        .toList();
+		    ResponseDTO.setTransferData(response);
+		    
 
-		    return ResponseEntity.ok(response);
+		    return ResponseEntity.ok(ResponseDTO);
 		}
 
 

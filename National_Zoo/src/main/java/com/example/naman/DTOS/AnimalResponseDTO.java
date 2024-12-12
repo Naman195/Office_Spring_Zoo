@@ -13,7 +13,7 @@ import lombok.Setter;
 public class AnimalResponseDTO {
 
 	
-	private String animalId;
+	private Long animalId;
 	
 	private String animalName;
 	
