@@ -90,8 +90,11 @@ public class UserService {
 	    authenticationManager.authenticate(
 	        new UsernamePasswordAuthenticationToken(username, password)
 	    );
+	    
+	    ResponseUserDTO userResponse = modelMapper.map(user, ResponseUserDTO.class);
+	    
 
-	    return new UserResponse(user.getUserId(), user.getUsername(), "", "User LoggedIn SuccessFully");
+	    return new UserResponse(user.getUserId(), user.getUsername(), "", "User LoggedIn SuccessFully", userResponse);
 	}
 	
 	

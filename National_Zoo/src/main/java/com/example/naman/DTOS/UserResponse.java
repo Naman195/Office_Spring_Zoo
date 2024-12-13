@@ -14,4 +14,5 @@ public class UserResponse {
     private String username;
     private String token;
     private String message;
+    private ResponseUserDTO user;
 }
