@@ -6,6 +6,8 @@ import java.util.Collections;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,11 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +36,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "user")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
 
 	/**
@@ -73,7 +78,16 @@ public class User implements UserDetails {
 	private Instant updatedAt;
 	
 	private boolean archieved;
+	
+	@LastModifiedBy
+	@Column(name = "updated_by", nullable = true, updatable = true)
+	private String updatedBy;
 
+	@PrePersist
+	public void func() {
+		updatedBy = null;
+	}
+	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 //		System.out.println("Hello" +  role.getRole());
@@ -109,6 +123,7 @@ public class User implements UserDetails {
 		// TODO Auto-generated method stub
 		return true;
 	}
+	
 	
 	
 	
