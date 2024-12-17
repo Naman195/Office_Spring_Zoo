@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AddressDTO;
 import com.example.naman.DTOS.CreateZooDTO;
+import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Address;
 import com.example.naman.entities.City;
@@ -74,21 +75,29 @@ public class ZooService {
 	
 	public void deleteZooById(Long id) {
 		Zoo zoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
-		zoo.setArchieved(!zoo.isArchieved());
+		zoo.setArchieved(true);
 		zooRepository.save(zoo);
 	}
 	
 	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, Long id)
 	{
 		Zoo existingZoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
-		modelMapper.map(updateZooDTO, existingZoo);
-		Long cityId = updateZooDTO.getAddress().getCity().getCityId();
-		City city = cityRepository.findById(cityId).orElseThrow(() -> new ResourceNotFoundException("City not found with ID: " + cityId));
-		existingZoo.getAddress().setCity(city);
-        Zoo updatedZoo = zooRepository.save(existingZoo);
-		
+		existingZoo.setZooName(updateZooDTO.getZooName());
+		Address address = existingZoo.getAddress();
+		AddressDTO addressDTO = updateZooDTO.getAddress();
+		if(addressDTO !=  null) {
+			address.setStreet(addressDTO.getStreet());
+			address.setZipCode(addressDTO.getZipCode());
+			
+			City city = cityRepository.findById(addressDTO.getCity().getCityId())
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
+			address.setCity(city);			
+		}
+		Zoo  updatedZoo = zooRepository.save(existingZoo);
 		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}
+	
+	 
 	
 	
 	public List<ZooResponseDTO> searchByNameOrLocation(String searchItem){

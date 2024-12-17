@@ -27,7 +27,7 @@ import com.example.naman.services.AnimalService;
 import com.example.naman.services.ZooService;
 
 @RestController
-@RequestMapping("/api/animal")
+@RequestMapping("/animal")
 public class AnimalController {
 	
 	@Autowired
@@ -40,7 +40,7 @@ public class AnimalController {
 	private ModelMapper modelMapper;
 	
 	@PreAuthorize("hasRole('admin')")
-	@PostMapping("/addAnimal")
+	@PostMapping("/add")
 	public ResponseEntity<AnimalResponseDTO> saveAnimal(@RequestBody CreateAnimalDTO animalDTO) {
 		
 		ZooResponseDTO zooResponseDTO = zooService.getZooById(animalDTO.getZoo().getZooId());
@@ -51,21 +51,21 @@ public class AnimalController {
 		return ResponseEntity.ok(animalResponseDTO);		
 	}
 	
-	@GetMapping("/ZooAnimalsByZooId/{id}")
+	@GetMapping("/all/{id}")
 	public ResponseEntity<Page<AnimalResponseDTO>> getAnimalsByZooId(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int size, @PathVariable Long id){
 		Pageable pageable = PageRequest.of(page, size);
 		Page<AnimalResponseDTO> animals = animalService.getAnimalByZooId(id, pageable);
 		return ResponseEntity.ok(animals);
 	}
 	
-	@GetMapping("/ani-id/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<AnimalResponseDTO> getAnimalById(@PathVariable Long id)
 	{
 		return ResponseEntity.ok(animalService.getAnimalById(id));
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/deleteAnimalById/{id}")
+	@PatchMapping("/delete/{id}")
 	public String deleteAnimalById(@PathVariable Long id)
 	{
 		animalService.deletedAnimal(id);
@@ -73,7 +73,7 @@ public class AnimalController {
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/updateAnimal/{id}")
+	@PatchMapping("/update/{id}")
 	public ResponseEntity<AnimalResponseDTO> updateAnimalDetail(@RequestBody CreateAnimalDTO animal, @PathVariable Long id)
 	
 	{
@@ -86,15 +86,15 @@ public class AnimalController {
 	    }
 	 
 	 @PreAuthorize("hasRole('admin')")
-	 @GetMapping("/zooListByZooId/{id}")
-	 public ResponseEntity<List<ZooResponseDTO>> findAllZoo(@PathVariable Long id){
-		 return ResponseEntity.ok(animalService.getAllZooExceptCurrentZoo(id));
+	 @GetMapping("getzoolist/{zooid}")
+	 public ResponseEntity<List<ZooResponseDTO>> findAllZooExceptCurrent(@PathVariable Long zooid){
+		 return ResponseEntity.ok(animalService.getAllZooExceptCurrentZoo(zooid));
 	 }
 	 
 	 @PreAuthorize("hasRole('admin')")
-	 @PatchMapping("/transferAnimal/{animalId}/to/{newZooId}")
-	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalId, @PathVariable Long newZooId){
-		 return ResponseEntity.ok(animalService.transferAnimal(animalId, newZooId));
+	 @PatchMapping("/transfer/{animalid}/to/{newzooid}")
+	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalid, @PathVariable Long newzooid){
+		 return ResponseEntity.ok(animalService.transferAnimal(animalid, newzooid));
 	 }
 	 
 	 @PreAuthorize("hasRole('admin')")

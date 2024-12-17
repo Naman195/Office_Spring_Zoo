@@ -24,14 +24,14 @@ import com.example.naman.entities.Zoo;
 import com.example.naman.services.ZooService;
 
 @RestController
-@RequestMapping("/api/zoo")
+@RequestMapping("/zoo")
 public class ZooController {
 
 	@Autowired
 	private ZooService zooService;
 	
 	@PreAuthorize("hasRole('admin')")
-	@PostMapping("/create")
+	@PostMapping("/add")
 	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo) {
 		try {
 	        zooService.createZoo(zoo);
@@ -41,7 +41,7 @@ public class ZooController {
 	    }
 	}
 	
-	@GetMapping("/allZoo")
+	@GetMapping("/fetchall")
 	public ResponseEntity<Page<ZooResponseDTO>> getAllZoo(@RequestParam(defaultValue = "0") int page,  @RequestParam(defaultValue = "3") int size)
 	{
 		Pageable pageable = PageRequest.of(page, size);
@@ -51,20 +51,20 @@ public class ZooController {
 	}
 	
 	
-	@GetMapping("/id/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<ZooResponseDTO> getZooById(@PathVariable Long id) {
 		return ResponseEntity.ok(zooService.getZooById(id));
-	}
+	}	
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/deleleZoo/{id}")
+	@PatchMapping("/delete/{id}")
 	public String deleteZoo(@PathVariable Long id) {
 		zooService.deleteZooById(id);
 		return "Zoo Deleted SuccessFully";
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/updateZoo/{id}")
+	@PatchMapping("/update/{id}")
 	public ResponseEntity<ZooResponseDTO> updateZoo(@RequestBody CreateZooDTO zoo, @PathVariable Long id) {
 		return ResponseEntity.ok(zooService.updateZooById(zoo, id));
 	}

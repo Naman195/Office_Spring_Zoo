@@ -83,8 +83,9 @@ public class AnimalService {
 	
 	public void deletedAnimal(Long id)
 	{
+		
 		Animal ani = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Animal  Not Found"));
-		ani.setArchieved(!ani.isArchieved()); 
+		ani.setArchieved(true); 
 		animalRepository.save(ani);
 	}
 	

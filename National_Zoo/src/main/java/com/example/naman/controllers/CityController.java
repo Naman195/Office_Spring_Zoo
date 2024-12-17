@@ -12,15 +12,15 @@ import com.example.naman.entities.City;
 import com.example.naman.services.CityService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/city")
 public class CityController {
 
 	@Autowired
 	private CityService cityService;
 	
-	@GetMapping("/cities/{cityId}")
-	public List<City> getAllCitiesByStateId(@PathVariable  Long cityId)
+	@GetMapping("/{stateId}")
+	public List<City> getAllCitiesByStateId(@PathVariable  Long stateId)
 	{
-		return cityService.getAllCitiesByStateId(cityId);
+		return cityService.getAllCitiesByStateId(stateId);
 	}
 }

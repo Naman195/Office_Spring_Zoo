@@ -14,7 +14,7 @@ import com.example.naman.services.RolesService;
 
 
 @RestController
-@RequestMapping("/api/role")
+@RequestMapping("/role")
 public class RolesController {
 	
 	@Autowired
@@ -23,8 +23,7 @@ public class RolesController {
 	@GetMapping("/all")
 	public ResponseEntity<List<RoleResponseDTO>> getRole()
 	{
-		List<RoleResponseDTO> list = rolesService.getRoles();
-		return ResponseEntity.ok(list);
+		return ResponseEntity.ok(rolesService.getRoles());
 	}
 
 }

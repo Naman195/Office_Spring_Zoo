@@ -11,14 +11,14 @@ import com.example.naman.entities.Country;
 import com.example.naman.services.CountryService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/country")
 public class CountryControllers {
 
 	@Autowired
 	private CountryService countryService;
 	
 	
-	@GetMapping("/countries")
+	@GetMapping("/all")
 	public List<Country> getAllCountries(){
 		return countryService.getAllCountry();		
 	}

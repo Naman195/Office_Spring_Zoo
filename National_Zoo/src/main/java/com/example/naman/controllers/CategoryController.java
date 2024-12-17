@@ -12,7 +12,7 @@ import com.example.naman.DTOS.CategoryRepositoryDTO;
 import com.example.naman.services.CategoryService;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/category")
 public class CategoryController {
 
 	@Autowired

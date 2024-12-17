@@ -10,13 +10,13 @@ import com.example.naman.entities.Address;
 import com.example.naman.services.AddressService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/address")
 public class AddressController {
 
 	@Autowired
 	private AddressService addressService;
 	
-	@PostMapping("/save-add")
+	@PostMapping("/save")
 	public Address saveAddress(@RequestBody Address address) 
 	{
 		return addressService.createAddress(address);

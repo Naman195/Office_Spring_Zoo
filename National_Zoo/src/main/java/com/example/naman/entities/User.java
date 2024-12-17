@@ -101,26 +101,26 @@ public class User implements UserDetails {
 	}
 
 	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
+	public boolean isAccountNonExpired()
+	{
 		return true;
 	}
 
 	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
+	public boolean isAccountNonLocked()
+	{
 		return true;
 	}
 
 	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
+	public boolean isCredentialsNonExpired()
+	{
 		return true;
 	}
 
 	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
+	public boolean isEnabled() 
+	{
 		return true;
 	}
 	

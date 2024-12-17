@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +29,9 @@ import com.example.naman.entities.User;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.UserService;
 
-import jakarta.validation.Valid;
-
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class UserController {
 
 	@Autowired
@@ -43,7 +40,7 @@ public class UserController {
 	@Autowired
 	private JwtService jwtService;
 
-	@PostMapping("/user/create")
+	@PostMapping("/create")
 	public ResponseEntity<String> createUser(@RequestBody CreateUserDTO user) {
 		try {
 			userService.createUser(user);
@@ -61,10 +58,10 @@ public class UserController {
 
 
 
-	@PostMapping("/user/login")
+	@PostMapping("/login")
 	public ResponseEntity<UserResponse> loginUser(@RequestBody CredentialsDTO credentials) {
 		try {
-			UserResponse authenticatedUser = userService.LoginUser(credentials.getUsername(), credentials.getPassword());
+			UserResponse authenticatedUser = userService.loginUser(credentials.getUsername(), credentials.getPassword());
 			User user = userService.findByUsername(credentials.getUsername());
 			String jwtToken = jwtService.generateToken(user);
 			authenticatedUser.setToken(jwtToken);
@@ -86,7 +83,7 @@ public class UserController {
 		return ResponseEntity.ok(users);
 	}
 
-	@GetMapping("/user/{id}")
+	@GetMapping("/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable Long id) {
 		try {
 			ResponseUserDTO user = userService.getUserById(id);

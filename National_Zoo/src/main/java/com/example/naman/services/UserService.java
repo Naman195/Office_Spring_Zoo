@@ -79,7 +79,7 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public UserResponse LoginUser(String username, String password) {
+	public UserResponse loginUser(String username, String password) {
 	    User user = userRepository.findByuserName(username)
 	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
