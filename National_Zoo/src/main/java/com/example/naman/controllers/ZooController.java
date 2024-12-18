@@ -2,6 +2,8 @@ package com.example.naman.controllers;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,15 +29,21 @@ import com.example.naman.services.ZooService;
 @RestController
 @RequestMapping("/zoo")
 public class ZooController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ZooController.class);
 
 	@Autowired
 	private ZooService zooService;
 	
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/add")
-	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo, @RequestParam("image") MultipartFile image) {
+	public ResponseEntity<?> createZoo(@RequestPart CreateZooDTO zoo, @RequestPart("file") MultipartFile file) {
+		logger.info("ZooController initialized");
 		try {
-	        zooService.createZoo(zoo, image);
+			if (zoo == null) {
+		        return ResponseEntity.badRequest().body("Zoo part is missing");
+		    }
+	        zooService.createZoo(zoo, file);
 	        return ResponseEntity.ok("Zoo created successfully!");
 	    } catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
