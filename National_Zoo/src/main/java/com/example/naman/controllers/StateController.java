@@ -21,6 +21,6 @@ public class StateController  {
 	
 	@GetMapping("/{countryId}")
 	public List<State> getAllStatesByCountryId(@PathVariable Long countryId){
-		return stateService.getStatesByCountryId(countryId);		
+		return stateService.getAllStatesByCountryId(countryId);		
 	}
 }

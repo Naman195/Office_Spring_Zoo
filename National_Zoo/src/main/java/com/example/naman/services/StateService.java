@@ -14,7 +14,7 @@ public class StateService {
 	@Autowired
 	private StateRepository stateRepository;
 
-	public List<State> getStatesByCountryId(Long id)
+	public List<State> getAllStatesByCountryId(Long id)
 	{
 		return stateRepository.findByCountryCountryId(id);
 	}

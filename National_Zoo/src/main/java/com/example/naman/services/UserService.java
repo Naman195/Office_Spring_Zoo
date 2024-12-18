@@ -72,8 +72,8 @@ public class UserService {
 		}
 		
 		User user = modelMapper.map(userDTO, User.class);
-		Roles roles = roleRepository.findById(userDTO.getRoleId()).get();
-		user.setRole(roles);
+		Roles role = roleRepository.findById(userDTO.getRoleId()).get();
+		user.setRole(role);
 		String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
 		user.setPassword(password);
 		userRepository.save(user);
@@ -98,18 +98,14 @@ public class UserService {
 	}
 	
 	
-	
-	
 	public List<ResponseUserDTO> getAllUser(){
 		List<User> users =  userRepository.findAll();
 		
 		List<User> filteredusers = 	users.stream().filter(user -> !user.isArchieved()).collect(Collectors.toList());
 		
 		
-		List<ResponseUserDTO> allUsers = filteredusers.stream()
+		return filteredusers.stream()
 				.map(user -> modelMapper.map(user, ResponseUserDTO.class)).collect(Collectors.toList());
-		
-		return allUsers;
 		
 	}
 	
@@ -119,16 +115,14 @@ public class UserService {
 	        .filter(user -> !user.isArchieved())
 	        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + id + " not found"));
 	    
-	    ResponseUserDTO userDTo =  modelMapper.map(existingUser, ResponseUserDTO.class);
-	    return userDTo;
+	    return  modelMapper.map(existingUser, ResponseUserDTO.class);
+
 	}
 	
 	public User findByUsername(String username) {
 		return userRepository.findByuserName(username)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	    }
-	
-	
 	
 	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto) {
 	        
@@ -157,8 +151,7 @@ public class UserService {
 	 public void deleteUserById(Long id) {
 	        User user = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-	        
-	        user.setArchieved(!user.isArchieved());
+	        user.setArchieved(true);
 	        userRepository.save(user);
 	    }
 	
@@ -179,7 +172,6 @@ public class UserService {
 	    }
 	 
 	 public ResponseEntity<Map<String, String>> verifyOtp(String email, String otp){
-		  
 		 boolean isValid = 	otpHelper.validateOtp(email, otp);
 		 
 		 if(isValid) {

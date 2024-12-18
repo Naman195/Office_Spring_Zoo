@@ -39,7 +39,7 @@ public class AnimalController {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasRole('admin')")	
 	@PostMapping("/add")
 	public ResponseEntity<AnimalResponseDTO> saveAnimal(@RequestBody CreateAnimalDTO animalDTO) {
 		

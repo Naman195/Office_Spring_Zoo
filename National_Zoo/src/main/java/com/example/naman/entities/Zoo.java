@@ -51,6 +51,8 @@ public class Zoo {
 	private boolean archieved;
 	
 	
+	
+	
 	@CreationTimestamp
 	@CreatedDate
 	@Column(name = "created_at", updatable = false)
@@ -68,18 +70,11 @@ public class Zoo {
 	@Column(name = "updated_by", nullable = true, updatable = true)
 	private String updatedBy;
 	
+	private String image;
+	
 	@PrePersist
 	public void func() {
 		updatedBy = null;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-
 }

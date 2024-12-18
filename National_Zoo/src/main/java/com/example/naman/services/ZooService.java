@@ -1,22 +1,25 @@
 package com.example.naman.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AddressDTO;
 import com.example.naman.DTOS.CreateZooDTO;
-import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Address;
 import com.example.naman.entities.City;
@@ -24,7 +27,7 @@ import com.example.naman.entities.Zoo;
 import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.ZooRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @Service
 public class ZooService {
@@ -38,23 +41,53 @@ public class ZooService {
 	@Autowired
 	private ModelMapper modelMapper;
 	
+	@Value("${file.upload-dir}")
+    private String uploadDir;
+	
 	
 
-	public void createZoo(CreateZooDTO zoo)
+	public void createZoo(CreateZooDTO zoo, MultipartFile image)
 	{
 		try {
 	        Zoo newZoo = modelMapper.map(zoo, Zoo.class);
+	        if(image != null && !image.isEmpty()) {
+	        	String imageName = saveImage(image);
+	        	newZoo.setImage(imageName);
+	        }
 	        zooRepository.save(newZoo);
-	    } catch (Exception e) {
+	    
+		} catch (IOException e) {
+	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
+	    }  catch (Exception e) {
 	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create zoo: " + e.getMessage());
 
 	    }
 	}
 	
+	private String saveImage(MultipartFile image) throws IOException {
+		
+		if (image.isEmpty()) {
+			throw new IllegalArgumentException("Image file is empty");
+		}
+		
+		
+		Path uploadPath = Paths.get(uploadDir);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
+		
+		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+		Path filePath = uploadPath.resolve(fileName);
+		Files.write(filePath, image.getBytes());
+
+		return fileName.toString();	
+	}
+	
+	
+	
 	
 	public Page<ZooResponseDTO> getAllZoo(Pageable pageable)
-	{
-	    
+	{  
 	    Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
 	    
 	    List<ZooResponseDTO> zooResponseDTOs = allZoo.getContent().stream()
@@ -97,8 +130,6 @@ public class ZooService {
 		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}
 	
-	 
-	
 	
 	public List<ZooResponseDTO> searchByNameOrLocation(String searchItem){
 		
@@ -109,7 +140,5 @@ public class ZooService {
 	 
 
     }
-	
-	
-	
+		
 }

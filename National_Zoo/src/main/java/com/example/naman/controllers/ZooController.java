@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
-import com.example.naman.entities.Zoo;
 import com.example.naman.services.ZooService;
 
 @RestController
@@ -32,9 +32,9 @@ public class ZooController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/add")
-	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo) {
+	public ResponseEntity<?> createZoo(@RequestBody CreateZooDTO zoo, @RequestParam("image") MultipartFile image) {
 		try {
-	        zooService.createZoo(zoo);
+	        zooService.createZoo(zoo, image);
 	        return ResponseEntity.ok("Zoo created successfully!");
 	    } catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());

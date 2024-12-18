@@ -190,8 +190,4 @@ public class AnimalService {
 		    ResponseDTO.setTransferData(response);
 		    return ResponseEntity.ok(ResponseDTO);
 		}
-
-
-	 
-	
 }
