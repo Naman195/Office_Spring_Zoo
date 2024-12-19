@@ -84,8 +84,6 @@ public class ZooService {
 	}
 	
 	
-	
-	
 	public Page<ZooResponseDTO> getAllZoo(Pageable pageable)
 	{  
 	    Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
@@ -112,7 +110,7 @@ public class ZooService {
 		zooRepository.save(zoo);
 	}
 	
-	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, Long id)
+	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, MultipartFile image,  Long id) throws IOException
 	{
 		Zoo existingZoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
 		existingZoo.setZooName(updateZooDTO.getZooName());
@@ -126,6 +124,12 @@ public class ZooService {
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
 			address.setCity(city);			
 		}
+		
+		if(image != null && !image.isEmpty()) {
+			String imageName = saveImage(image);
+			existingZoo.setImage(imageName);        	
+		}
+		
 		Zoo  updatedZoo = zooRepository.save(existingZoo);
 		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}

@@ -14,6 +14,7 @@ public class ZooResponseDTO {
 
 	private Long zooId;
 	private String zooName;
+	private String image;
 	
 	private ZooAddressDTO address;
 	

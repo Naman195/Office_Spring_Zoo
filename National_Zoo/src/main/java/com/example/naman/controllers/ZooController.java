@@ -1,5 +1,6 @@
 package com.example.naman.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -28,30 +29,25 @@ import com.example.naman.services.ZooService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.mail.Multipart;
+
 @RestController
 @RequestMapping("/zoo")
 public class ZooController {
-	
-	private static final Logger logger = LoggerFactory.getLogger(ZooController.class);
 
 	@Autowired
 	private ZooService zooService;
 	
+	@PreAuthorize("hasRole('admin')")
 	@PostMapping(value = "/add", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> createZoo(@RequestPart("zoo") String zooJson, @RequestPart("file") MultipartFile file) {
-	    logger.info("ZooController initialized");
 
 	    try {
-	        // Convert JSON String to DTO
 	        ObjectMapper objectMapper = new ObjectMapper();
 	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
-	        
-	        if (zoo == null) {
-	            return ResponseEntity.badRequest().body("Zoo part is missing");
-	        }
-	        
+	     
 	        zooService.createZoo(zoo, file);
-	        return ResponseEntity.ok("Zoo created successfully!");
+	        return ResponseEntity.ok("Zoo created successfully!");	
 	    } catch (JsonProcessingException e) {
 	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
 	    } catch (ResponseStatusException e) {
@@ -82,9 +78,20 @@ public class ZooController {
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/update/{id}")
-	public ResponseEntity<ZooResponseDTO> updateZoo(@RequestBody CreateZooDTO zoo, @PathVariable Long id) {
-		return ResponseEntity.ok(zooService.updateZooById(zoo, id));
+	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
+	public ResponseEntity<?> updateZoo(@RequestPart("zoo") String zooJson, @RequestPart("file") MultipartFile file, @PathVariable Long id) throws IOException {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
+			return ResponseEntity.ok(zooService.updateZooById(zoo, file, id));
+		} catch (JsonProcessingException e) {
+	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	    }
+		catch (ResponseStatusException e) {
+	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+	    }
+		
+		
 	}
 	
     
