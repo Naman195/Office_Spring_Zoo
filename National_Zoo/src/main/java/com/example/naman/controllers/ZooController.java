@@ -40,7 +40,8 @@ public class ZooController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping(value = "/add", consumes = { "multipart/form-data" })
-	public ResponseEntity<?> createZoo(@RequestPart("zoo") String zooJson, @RequestPart("file") MultipartFile file) {
+	public ResponseEntity<?> createZoo(@RequestPart("zoo") String zooJson, 
+            @RequestPart(value = "file", required = false) MultipartFile file)  {
 
 	    try {
 	        ObjectMapper objectMapper = new ObjectMapper();
@@ -79,7 +80,9 @@ public class ZooController {
 	
 	@PreAuthorize("hasRole('admin')")
 	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
-	public ResponseEntity<?> updateZoo(@RequestPart("zoo") String zooJson, @RequestPart("file") MultipartFile file, @PathVariable Long id) throws IOException {
+	public ResponseEntity<?> updateZoo(@RequestPart("zoo") String zooJson, 
+            @RequestPart(value = "file", required = false) MultipartFile file, 
+            @PathVariable Long id) throws IOException {
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
