@@ -25,6 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.services.ZooService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/zoo")
@@ -35,16 +37,23 @@ public class ZooController {
 	@Autowired
 	private ZooService zooService;
 	
-	@PreAuthorize("hasRole('admin')")
-	@PostMapping("/add")
-	public ResponseEntity<?> createZoo(@RequestPart CreateZooDTO zoo, @RequestPart("file") MultipartFile file) {
-		logger.info("ZooController initialized");
-		try {
-			if (zoo == null) {
-		        return ResponseEntity.badRequest().body("Zoo part is missing");
-		    }
+	@PostMapping(value = "/add", consumes = { "multipart/form-data" })
+	public ResponseEntity<?> createZoo(@RequestPart("zoo") String zooJson, @RequestPart("file") MultipartFile file) {
+	    logger.info("ZooController initialized");
+
+	    try {
+	        // Convert JSON String to DTO
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
+	        
+	        if (zoo == null) {
+	            return ResponseEntity.badRequest().body("Zoo part is missing");
+	        }
+	        
 	        zooService.createZoo(zoo, file);
 	        return ResponseEntity.ok("Zoo created successfully!");
+	    } catch (JsonProcessingException e) {
+	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
 	    } catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 	    }
