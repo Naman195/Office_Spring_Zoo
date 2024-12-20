@@ -1,5 +1,9 @@
 package com.example.naman.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AnimalData_TransferHistoryDataDTO;
 import com.example.naman.DTOS.AnimalResponseDTO;
@@ -44,14 +51,52 @@ public class AnimalService {
 	@Autowired
 	private TransferHistoryRepository transferHistoryRepository;
 	
-	public AnimalResponseDTO addAnimal(CreateAnimalDTO animal)
+	@Value("${file.upload-dir}")
+    private String uploadDir;
+	
+	public void addAnimal(CreateAnimalDTO animal, MultipartFile image)
 	{
-		Animal addAnimal = modelMapper.map(animal, Animal.class);
-		Animal savedAnimal =  animalRepository.save(addAnimal);
+		try {
+			Animal addAnimal = modelMapper.map(animal, Animal.class);
+			if(image != null && !image.isEmpty()) {
+	        	String imageName = saveImage(image);
+	        	addAnimal.setImage(imageName);
+	        }
+			
+		 animalRepository.save(addAnimal);
+			
+//			AnimalResponseDTO responseDTO = modelMapper.map(savedAnimal, AnimalResponseDTO.class);
+//			return responseDTO;
+			
+		} catch (IOException e) {
+	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
+	    }  catch (Exception e) {
+	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to add Animal: " + e.getMessage());
+
+	    }
 		
-		AnimalResponseDTO responseDTO = modelMapper.map(savedAnimal, AnimalResponseDTO.class);
-		return responseDTO;
+		
 	}
+	
+private String saveImage(MultipartFile image) throws IOException {
+		
+		if (image.isEmpty()) {
+			throw new IllegalArgumentException("Image file is empty");
+		}
+		
+		
+		Path uploadPath = Paths.get(uploadDir);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
+		
+		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+		Path filePath = uploadPath.resolve(fileName);
+		Files.write(filePath, image.getBytes());
+
+		return fileName.toString();	
+	}
+	
 	
 	public Page<Animal> getAllAnimals(Pageable pageable)
 	{
@@ -89,13 +134,20 @@ public class AnimalService {
 		animalRepository.save(ani);
 	}
 	
-	public AnimalResponseDTO updateAnimalById(CreateAnimalDTO updateAnimalDTO, Long id)
+	public AnimalResponseDTO updateAnimalById(CreateAnimalDTO updateAnimalDTO, MultipartFile image,  Long id) throws IOException
 	{
 		Animal existingAnimal = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Animal  Not Found"));
+		String oldImageName = existingAnimal.getImage();
 		modelMapper.map(updateAnimalDTO, existingAnimal);
 		Long zooId = updateAnimalDTO.getZoo().getZooId();
 		Zoo zoo = zooRepository.findById(zooId).orElseThrow(() -> new ResourceNotFoundException("Zoo not found with ID: " + zooId));
 		existingAnimal.setZoo(zoo);
+		if(image != null && !image.isEmpty()) {
+			String imageName = saveImage(image);
+			existingAnimal.setImage(imageName);        	
+		}else {
+			existingAnimal.setImage(oldImageName);
+		}
 		Animal updatedAnimal = animalRepository.save(existingAnimal);
 		return modelMapper.map(updatedAnimal, AnimalResponseDTO.class);
 	

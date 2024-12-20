@@ -1,5 +1,6 @@
 package com.example.naman.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -16,15 +17,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AnimalResponseDTO;
 import com.example.naman.DTOS.CreateAnimalDTO;
+import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
 import com.example.naman.entities.Zoo;
 import com.example.naman.services.AnimalService;
 import com.example.naman.services.ZooService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/animal")
@@ -40,15 +47,28 @@ public class AnimalController {
 	private ModelMapper modelMapper;
 	
 	@PreAuthorize("hasRole('admin')")	
-	@PostMapping("/add")
-	public ResponseEntity<AnimalResponseDTO> saveAnimal(@RequestBody CreateAnimalDTO animalDTO) {
+	@PostMapping(value="/add", consumes = { "multipart/form-data" })
+	public ResponseEntity<?> saveAnimal(@RequestPart("animal") String animalJSON, @RequestPart(value="file", required = false) MultipartFile file) {
 		
-		ZooResponseDTO zooResponseDTO = zooService.getZooById(animalDTO.getZoo().getZooId());
-		Zoo zoo = modelMapper.map(zooResponseDTO, Zoo.class);
-		Animal animal = modelMapper.map(animalDTO, Animal.class);
-		animal.setZoo(zoo);
-		AnimalResponseDTO animalResponseDTO  = animalService.addAnimal(animalDTO);
-		return ResponseEntity.ok(animalResponseDTO);		
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			CreateAnimalDTO animalDTO = objectMapper.readValue(animalJSON, CreateAnimalDTO.class);
+			
+			ZooResponseDTO zooResponseDTO = zooService.getZooById(animalDTO.getZoo().getZooId());
+			Zoo zoo = modelMapper.map(zooResponseDTO, Zoo.class);
+			Animal animal = modelMapper.map(animalDTO, Animal.class);
+			animal.setZoo(zoo);
+			animalService.addAnimal(animalDTO, file);
+			return ResponseEntity.ok("Animal added successfully");	
+			
+		} catch (JsonProcessingException e) {
+	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	    } catch (ResponseStatusException e) {
+	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+	    }
+		
+		
+			
 	}
 	
 	@GetMapping("/all/{id}")
@@ -73,11 +93,25 @@ public class AnimalController {
 	}
 	
 	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/update/{id}")
-	public ResponseEntity<AnimalResponseDTO> updateAnimalDetail(@RequestBody CreateAnimalDTO animal, @PathVariable Long id)
-	
+	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
+	public ResponseEntity<?> updateAnimalDetail(@RequestPart("animal") String animalJSON, 
+			@RequestPart(value = "file" , required=false) MultipartFile file, 
+			@PathVariable Long id)  throws IOException
 	{
-		return ResponseEntity.ok(animalService.updateAnimalById(animal, id));
+		
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			CreateAnimalDTO animal = objectMapper.readValue(animalJSON, CreateAnimalDTO.class);
+			return ResponseEntity.ok(animalService.updateAnimalById(animal, file,  id));
+			
+		} catch (JsonProcessingException e) {
+	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	    }
+		catch (ResponseStatusException e) {
+	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+	    }
+		
+		
 	}
 	
 	 @GetMapping("/search")

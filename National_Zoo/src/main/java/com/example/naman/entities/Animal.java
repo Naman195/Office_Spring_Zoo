@@ -57,6 +57,8 @@ public class Animal {
 	@JoinColumn(name = "zoo_id", nullable = false)
 	private Zoo zoo;
 	
+	private String image;
+	
 	
 	@CreatedBy
 	@Column(name = "created_by", nullable = false)

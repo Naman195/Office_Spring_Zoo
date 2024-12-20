@@ -15,6 +15,8 @@ private String animalName;
 	
 	private String animalType;
 	
+	private String image;
+	
 	private ZooDTO zoo;
 
 	

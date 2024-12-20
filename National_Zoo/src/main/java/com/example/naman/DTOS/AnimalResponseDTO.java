@@ -19,6 +19,8 @@ public class AnimalResponseDTO {
 	
 	private String animalType;
 	
+	private String image;
+	
 	private ZooResponseDTO zoo;
 	
 	
