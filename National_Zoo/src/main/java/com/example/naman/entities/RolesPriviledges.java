@@ -38,3 +38,21 @@ public class RolesPriviledges {
 	private Priviledges priviledges;
 	
 }
+
+//create table priviledges (
+//		id bigint primary key AUTO_INCREMENT,
+//	    priviledges varchar(100) not null );
+//	    
+//
+//	create table roles_priviledges (
+//		id bigint primary key AUTO_INCREMENT,
+//	    role_id bigint not null,
+//	    priviledge_id bigint not null,
+//	    foreign key (role_id) references roles(id)
+//	    );
+//	    
+//	select * from roles;
+//
+//	insert into priviledges ( priviledges ) values ( "create" ), ( "update" ), ("delete");
+//
+//	select *  from priviledges;
