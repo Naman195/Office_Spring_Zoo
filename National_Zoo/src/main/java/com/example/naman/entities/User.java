@@ -23,6 +23,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,7 +43,7 @@ public class User implements UserDetails {
 	/**
 	 * 
 	 */
-//	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,6 +70,9 @@ public class User implements UserDetails {
 	@JoinColumn(name = "address_id")
 	private Address address;
 	
+	@Transient
+	private  Collection<? extends GrantedAuthority> authority;
+	
 	@CreationTimestamp
 	@Column(name = "created_at", updatable = false)
 	private Instant createdAt;
@@ -91,7 +95,8 @@ public class User implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 //		System.out.println("Hello" +  role.getRole());
-		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
+//		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
+		return authority;
 	}
 
 	@Override

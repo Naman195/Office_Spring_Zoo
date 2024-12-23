@@ -61,6 +61,9 @@ public class UserService {
 	@Autowired
 	 private JavaSmtpGmailSenderService senderService;
 	
+	@Autowired
+	private StorePassword storePassword;
+	
 	@Transactional
 	public void createUser(CreateUserDTO userDTO) {
 		if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
@@ -171,6 +174,8 @@ public class UserService {
 	        return ResponseEntity.ok(response);
 	    }
 	 
+	 
+	 
 	 public ResponseEntity<Map<String, String>> verifyOtp(String email, String otp){
 		 boolean isValid = 	otpHelper.validateOtp(email, otp);
 		 
@@ -178,6 +183,10 @@ public class UserService {
 			 User user = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found"));
 			 
 			 String forgotPasswordToken = jwtService.generateToken(user);
+			 
+//			 storePassword.storeTokenUrl(forgotPasswordToken);
+			 
+			 
 		        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
 		        
 		        Map<String, String> response = new HashMap<>();

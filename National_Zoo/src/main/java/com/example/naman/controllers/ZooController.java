@@ -38,7 +38,8 @@ public class ZooController {
 	@Autowired
 	private ZooService zooService;
 	
-	@PreAuthorize("hasRole('admin')")
+	 
+	@PreAuthorize("hasAuthority('create')")
 	@PostMapping(value = "/add", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> createZoo(@RequestPart("zoo") String zooJson, 
             @RequestPart(value = "file", required = false) MultipartFile file)  {
@@ -71,14 +72,14 @@ public class ZooController {
 		return ResponseEntity.ok(zooService.getZooById(id));
 	}	
 	
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('delete')")
 	@PatchMapping("/delete/{id}")
 	public String deleteZoo(@PathVariable Long id) {
 		zooService.deleteZooById(id);
 		return "Zoo Deleted SuccessFully";
 	}
 	
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('update')")
 	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> updateZoo(@RequestPart("zoo") String zooJson, 
             @RequestPart(value = "file", required = false) MultipartFile file, 

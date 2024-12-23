@@ -46,7 +46,7 @@ public class AnimalController {
 	@Autowired
 	private ModelMapper modelMapper;
 	
-	@PreAuthorize("hasRole('admin')")	
+	@PreAuthorize("hasAuthority('create')")	
 	@PostMapping(value="/add", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> saveAnimal(@RequestPart("animal") String animalJSON, @RequestPart(value="file", required = false) MultipartFile file) {
 		
@@ -84,7 +84,7 @@ public class AnimalController {
 		return ResponseEntity.ok(animalService.getAnimalById(id));
 	}
 	
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('delete')")
 	@PatchMapping("/delete/{id}")
 	public String deleteAnimalById(@PathVariable Long id)
 	{
@@ -92,7 +92,7 @@ public class AnimalController {
 		return "Animal Deleted SuccessFully";
 	}
 	
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('update')")
 	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> updateAnimalDetail(@RequestPart("animal") String animalJSON, 
 			@RequestPart(value = "file" , required=false) MultipartFile file, 
@@ -119,19 +119,19 @@ public class AnimalController {
 	        return animalService.searchByNameOrType(searchTerm, zooId);
 	    }
 	 
-	 @PreAuthorize("hasRole('admin')")
+	 
 	 @GetMapping("getzoolist/{zooid}")
 	 public ResponseEntity<List<ZooResponseDTO>> findAllZooExceptCurrent(@PathVariable Long zooid){
 		 return ResponseEntity.ok(animalService.getAllZooExceptCurrentZoo(zooid));
 	 }
 	 
-	 @PreAuthorize("hasRole('admin')")
+	 @PreAuthorize("hasAuthority('transfer')")
 	 @PatchMapping("/transfer/{animalid}/to/{newzooid}")
 	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalid, @PathVariable Long newzooid){
 		 return ResponseEntity.ok(animalService.transferAnimal(animalid, newzooid));
 	 }
 	 
-	 @PreAuthorize("hasRole('admin')")
+	 @PreAuthorize("hasRole('transfer')")
 	 @GetMapping("/history/{animalId}")
 	 public ResponseEntity<?> getAnimalTransferHistory(@PathVariable Long animalId) {
 	        return animalService.animalTransferHistory(animalId);
