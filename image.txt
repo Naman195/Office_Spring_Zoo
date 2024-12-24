@@ -1,0 +1,92 @@
+@Service
+public class TokenService {
+    private final Map<String, String> tokenStore = new HashMap<>();
+
+    public void storeToken(String key, String token) {
+        tokenStore.put(key, token);
+    }
+
+    public boolean isValidToken(String key, String token) {
+        return tokenStore.containsKey(key) && tokenStore.get(key).equals(token);
+    }
+
+    public void removeToken(String key) {
+        tokenStore.remove(key);
+    }
+}
+
+public ResponseEntity<Map<String, String>> verifyOtp(String email, String otp) {
+    boolean isValid = otpHelper.validateOtp(email, otp);
+
+    if (isValid) {
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String forgotPasswordToken = jwtService.generateToken(user);
+
+        // Generate a random key
+        String randomKey = UUID.randomUUID().toString();
+
+        // Store the URL in a HashMap with the random key
+        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
+        tokenStore.put(randomKey, resetPasswordUrl);
+
+        // Return the random key in the response instead of the URL
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "OTP verified successfully");
+        response.put("key", randomKey);
+
+        return ResponseEntity.ok(response);
+    } else {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(Map.of("message", "Invalid or expired OTP"));
+    }
+}
+
+
+
+
+
+
+
+
+public String setPassword(String tokenHeader, String newPassword, String randomKey) {
+    // Validate new password
+    if (newPassword == null || newPassword.length() < 6) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters long");
+    }
+
+    // Validate token header
+    if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token format");
+    }
+
+    String token = tokenHeader.substring(7);
+
+    // Check if the randomKey exists in the tokenStore
+    if (!tokenStore.containsKey(randomKey)) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired key");
+    }
+
+    // Validate the token matches the stored URL
+    String storedUrl = tokenStore.get(randomKey);
+    if (!storedUrl.contains(token)) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired token");
+    }
+
+    // Extract username from token
+    String username = jwtService.extractUsername(token);
+
+    // Fetch the user
+    User user = userRepository.findByuserName(username)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+    // Update and encode the new password
+    user.setPassword(bcryptPasswordEncoder.encode(newPassword));
+    userRepository.save(user);
+
+    // Remove the token after successful password reset
+    tokenStore.remove(randomKey);
+
+    return "Password updated successfully";
+}
