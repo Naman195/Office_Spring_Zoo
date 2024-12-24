@@ -1,5 +1,6 @@
 package com.example.naman.controllers;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.CreateUserDTO;
+import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.CredentialsDTO;
 import com.example.naman.DTOS.ForgotPasswordRequestDTO;
 import com.example.naman.DTOS.OtpResponseDTO;
@@ -28,6 +32,8 @@ import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.User;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RestController
@@ -40,12 +46,19 @@ public class UserController {
 	@Autowired
 	private JwtService jwtService;
 
-	@PostMapping("/create")
-	public ResponseEntity<String> createUser(@RequestBody CreateUserDTO user) {
-		try {
-			userService.createUser(user);
+	
+	@PostMapping(value = "/create", consumes = { "multipart/form-data" })
+	public ResponseEntity<String> createUser(@RequestPart("user") String userJson, 
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+		try {	
+			 ObjectMapper objectMapper = new ObjectMapper();
+		        CreateUserDTO user = objectMapper.readValue(userJson, CreateUserDTO.class);
+		        
+			userService.createUser(user, file);
 			return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
-		} catch (ResponseStatusException e) {
+		}catch (JsonProcessingException e) {
+	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	    } catch (ResponseStatusException e) {
 			String errorMessage = e.getReason();
 
 			UserResponse errorResponse = new UserResponse();
@@ -97,18 +110,25 @@ public class UserController {
 
 
 	
-	@PreAuthorize("hasRole('admin')")
-	@PatchMapping("/update/{id}")
-	public ResponseEntity<?> partialUpdateUser(@PathVariable Long id, @RequestBody UpdateUserDTO updateUserDTO) {
+	@PreAuthorize("hasAuthority('update')")
+	
+	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
+	 
+   
+	public ResponseEntity<?> partialUpdateUser(@PathVariable Long id, @RequestPart("userUpdate") String userJson,  @RequestPart(value = "file", required = false) MultipartFile file) throws IOException {
 		try {
-			ResponseUserDTO updatedUser = userService.partialUpdateUserById(id, updateUserDTO);
+			ObjectMapper objectMapper = new ObjectMapper();
+			UpdateUserDTO user = objectMapper.readValue(userJson, UpdateUserDTO.class);
+			ResponseUserDTO updatedUser = userService.partialUpdateUserById(id, user, file);
 			return ResponseEntity.ok(updatedUser);
-		} catch (Exception e) {
+		} catch (JsonProcessingException e) {
+	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	    } catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partial update failed: " + e.getMessage());
 		}
 	}
 
-	@PreAuthorize("hasRole('admin')")
+	@PreAuthorize("hasAuthority('admin')")
 	@PatchMapping("/delete/{id}")
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		try {

@@ -19,5 +19,7 @@ public class ResponseUserDTO {
 	
 	private String username;
 	
+	private String image;
+	
 	private UserAddressDTO address;
 }

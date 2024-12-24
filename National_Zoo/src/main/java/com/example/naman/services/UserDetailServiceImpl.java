@@ -1,7 +1,7 @@
 package com.example.naman.services;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +30,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
 		
 		User user = userRepository.findByuserName(username).orElseThrow(()-> new RuntimeException("Username is not Valid"));
 		
-		Set<Priviledges> priviledges = rolesPriviledgesService.getPriviledgeForRole(user.getRole().getRoleName());
-		Collection<GrantedAuthority> authorities  = priviledges.stream().map(priviledge -> new SimpleGrantedAuthority(priviledge.getPriviledges())).collect(Collectors.toList());
-		user.setAuthority(authorities);
+		user.setAuthority(rolesPriviledgesService.getPriviledgeForRole(user.getRole()));
+		
 		return user;		
 	}
 	

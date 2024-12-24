@@ -21,5 +21,7 @@ public class CreateUserDTO {
 	
 	private Long roleId;
 	
+	private String image;
+	
 	private AddressDTO address;
 }

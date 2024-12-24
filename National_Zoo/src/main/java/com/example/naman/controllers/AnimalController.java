@@ -131,7 +131,7 @@ public class AnimalController {
 		 return ResponseEntity.ok(animalService.transferAnimal(animalid, newzooid));
 	 }
 	 
-	 @PreAuthorize("hasRole('transfer')")
+	 @PreAuthorize("hasAuthority('transfer')")
 	 @GetMapping("/history/{animalId}")
 	 public ResponseEntity<?> getAnimalTransferHistory(@PathVariable Long animalId) {
 	        return animalService.animalTransferHistory(animalId);

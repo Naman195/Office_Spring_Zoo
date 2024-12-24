@@ -83,6 +83,8 @@ public class User implements UserDetails {
 	
 	private boolean archieved;
 	
+	private String image;
+	
 	@LastModifiedBy
 	@Column(name = "updated_by", nullable = true, updatable = true)
 	private String updatedBy;

@@ -1,5 +1,9 @@
 package com.example.naman.services;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,12 +11,14 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.AddressDTO;
@@ -61,25 +67,59 @@ public class UserService {
 	@Autowired
 	 private JavaSmtpGmailSenderService senderService;
 	
-	@Autowired
-	private StorePassword storePassword;
+		
+	@Value("${file.upload-dir}")
+    private String uploadDir;
+	
 	
 	@Transactional
-	public void createUser(CreateUserDTO userDTO) {
-		if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
-	        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+	public void createUser(CreateUserDTO userDTO, MultipartFile image) {
+		
+		try {
+			if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
+		        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+		    }
+			
+			if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+				throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+			}
+			
+			User user = modelMapper.map(userDTO, User.class);
+			Roles role = roleRepository.findById(userDTO.getRoleId()).get();
+			user.setRole(role);
+			String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
+			user.setPassword(password);
+			if(image != null && !image.isEmpty()) {
+	        	String imageName = saveImage(image);
+	        	user.setImage(imageName);
+	        }
+			userRepository.save(user);
+		} catch (IOException e) {
+	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
+	    }catch (Exception e) {
+	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create zoo: " + e.getMessage());
+
 	    }
 		
-		if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-			throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+	}
+	
+private String saveImage(MultipartFile image) throws IOException {
+		
+		if (image.isEmpty()) {
+			throw new IllegalArgumentException("Image file is empty");
 		}
 		
-		User user = modelMapper.map(userDTO, User.class);
-		Roles role = roleRepository.findById(userDTO.getRoleId()).get();
-		user.setRole(role);
-		String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
-		user.setPassword(password);
-		userRepository.save(user);
+		
+		Path uploadPath = Paths.get(uploadDir);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
+		
+		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+		Path filePath = uploadPath.resolve(fileName);
+		Files.write(filePath, image.getBytes());
+
+		return fileName.toString();	
 	}
 	
 	public UserResponse loginUser(String username, String password) {
@@ -127,7 +167,7 @@ public class UserService {
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	    }
 	
-	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto) {
+	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto, MultipartFile image) throws IOException {
 	        
 	        User user = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -145,6 +185,11 @@ public class UserService {
 	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
 	            address.setCity(city);
 	        }
+	        
+	        if(image != null && !image.isEmpty()) {
+				String imageName = saveImage(image);
+				user.setImage(imageName);        	
+			}
 
 	         userRepository.save(user);
 	         ResponseUserDTO res = modelMapper.map(user, ResponseUserDTO.class);
