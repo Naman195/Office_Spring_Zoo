@@ -12,6 +12,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.example.naman.annotations.UniqueEmail;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,7 +55,8 @@ public class User implements UserDetails {
 	@Column(name = "full_name", nullable = false)
 	private String fullName;
 	
-	@Column(name = "email", nullable = false, unique = true)
+	@UniqueEmail
+	@Column(name = "email", nullable = false)
 	private String email;
 	
 	@Column(name = "username", nullable = false, unique = true)

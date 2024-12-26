@@ -80,9 +80,9 @@ public class UserService {
 		        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 		    }
 			
-			if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-				throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
-			}
+//			if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+//				throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
+//			}
 			
 			User user = modelMapper.map(userDTO, User.class);
 			Roles role = roleRepository.findById(userDTO.getRoleId()).get();
@@ -97,7 +97,7 @@ public class UserService {
 		} catch (IOException e) {
 	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
 	    }catch (Exception e) {
-	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create zoo: " + e.getMessage());
+	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create user: " + e.getMessage());
 
 	    }
 		

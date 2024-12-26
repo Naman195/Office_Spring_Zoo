@@ -35,6 +35,8 @@ import com.example.naman.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -52,7 +54,8 @@ public class UserController {
             @RequestPart(value = "file", required = false) MultipartFile file) {
 		try {	
 			 ObjectMapper objectMapper = new ObjectMapper();
-		        CreateUserDTO user = objectMapper.readValue(userJson, CreateUserDTO.class);
+			 
+		       @Valid CreateUserDTO user = objectMapper.readValue(userJson, CreateUserDTO.class);
 		        
 			userService.createUser(user, file);
 			return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");

@@ -50,9 +50,6 @@ public class Zoo {
 	
 	private boolean archieved;
 	
-	
-	
-	
 	@CreationTimestamp
 	@CreatedDate
 	@Column(name = "created_at", updatable = false)
