@@ -55,7 +55,7 @@ public class User implements UserDetails {
 	@Column(name = "full_name", nullable = false)
 	private String fullName;
 	
-	@UniqueEmail
+	
 	@Column(name = "email", nullable = false)
 	private String email;
 	

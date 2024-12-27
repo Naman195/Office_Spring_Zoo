@@ -3,6 +3,8 @@ package com.example.naman.controllers;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,7 +37,9 @@ import com.example.naman.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
 
 
 @RestController
@@ -47,6 +51,9 @@ public class UserController {
 
 	@Autowired
 	private JwtService jwtService;
+	
+	@Autowired
+	private Validator validator;
 
 	
 	@PostMapping(value = "/create", consumes = { "multipart/form-data" })
@@ -55,7 +62,14 @@ public class UserController {
 		try {	
 			 ObjectMapper objectMapper = new ObjectMapper();
 			 
-		       @Valid CreateUserDTO user = objectMapper.readValue(userJson, CreateUserDTO.class);
+		        CreateUserDTO user = objectMapper.readValue(userJson, CreateUserDTO.class);
+		        
+		        Set<ConstraintViolation<CreateUserDTO>> violations = validator.validate(user);
+		        if(!violations.isEmpty()) {
+		        	String errorMessage = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "));
+		        	return
+		        ResponseEntity.badRequest().body(errorMessage);
+		        }
 		        
 			userService.createUser(user, file);
 			return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
