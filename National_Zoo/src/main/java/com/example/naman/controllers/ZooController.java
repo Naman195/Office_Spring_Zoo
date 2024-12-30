@@ -31,6 +31,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.mail.Multipart;
 
+/**
+ * Zoo Controller
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+  */
+
 @RestController
 @RequestMapping("/zoo")
 public class ZooController {
@@ -38,11 +45,19 @@ public class ZooController {
 	@Autowired
 	private ZooService zooService;
 	
+	/**
+	 * this controller is used for Add New Zoo
+	 * @param zooJson, zooImage.
+	 * @return "Zoo created successfully!"
+	 * 
+	 * @author Naman Arora
+	 * */
 	 
 	@PreAuthorize("hasAuthority('create')")
 	@PostMapping(value = "/add", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> createZoo(@RequestPart("zoo") String zooJson, 
-            @RequestPart(value = "file", required = false) MultipartFile file)  {
+            @RequestPart(value = "file", required = false) MultipartFile file)  
+	{
 
 	    try {
 	        ObjectMapper objectMapper = new ObjectMapper();
@@ -57,6 +72,14 @@ public class ZooController {
 	    }
 	}
 	
+	/**
+	 * this controller is used for get all Zoo List
+	 * @param page, size
+	 * @return List of Zoo as a Pagination Response.
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	@GetMapping("/fetchall")
 	public ResponseEntity<Page<ZooResponseDTO>> getAllZoo(@RequestParam(defaultValue = "0") int page,  @RequestParam(defaultValue = "3") int size)
 	{
@@ -67,23 +90,50 @@ public class ZooController {
 	}
 	
 	
+	/**
+	 * this controller is used for getZoo By Id.
+	 * @param ZooId.
+	 * @return ZooResponseDTO Zoo
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	@GetMapping("/{id}")
-	public ResponseEntity<ZooResponseDTO> getZooById(@PathVariable Long id) {
+	public ResponseEntity<ZooResponseDTO> getZooById(@PathVariable Long id) 
+	{
 		return ResponseEntity.ok(zooService.getZooById(id));
 	}	
 	
+	/**
+	 * this controller is used for archieved the Zoo.
+	 * @param ZooId
+	 * @return "Zoo Deleted SuccessFully"
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	@PreAuthorize("hasAuthority('delete')")
 	@PatchMapping("/delete/{id}")
-	public String deleteZoo(@PathVariable Long id) {
+	public String deleteZoo(@PathVariable Long id) 
+	{
 		zooService.deleteZooById(id);
 		return "Zoo Deleted SuccessFully";
 	}
+	
+	/**
+	 * this controller is used for update the details of Zoo.
+	 * @param zooid,  UpdatedzooJson, UpdatedzooImage.
+	 * @return Updated ZooresponseDTO Zoo.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@PreAuthorize("hasAuthority('update')")
 	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
 	public ResponseEntity<?> updateZoo(@RequestPart("zoo") String zooJson, 
             @RequestPart(value = "file", required = false) MultipartFile file, 
-            @PathVariable Long id) throws IOException {
+            @PathVariable Long id) throws IOException
+	{
 		try {
 			ObjectMapper objectMapper = new ObjectMapper();
 	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
@@ -94,14 +144,20 @@ public class ZooController {
 		catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 	    }
-		
-		
 	}
 	
+	/**
+	 * this controller is used for Search  a Zoo
+	 * @param searchItem
+	 * @return ZooList 
+	 * 
+	 * @author Naman Arora
+	 * */
     
     @GetMapping("/search")
     public ResponseEntity<List<ZooResponseDTO>> searchByNameOrLocation(
-            @RequestParam String searchItem) {
+            @RequestParam String searchItem)
+    {
     	List<ZooResponseDTO> searchList = zooService.searchByNameOrLocation(searchItem);
         return ResponseEntity.ok(searchList);
     }

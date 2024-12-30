@@ -10,6 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.naman.entities.Country;
 import com.example.naman.services.CountryService;
 
+/**
+ * Country Controller
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+ * */
+
 @RestController
 @RequestMapping("/country")
 public class CountryControllers {
@@ -17,6 +24,12 @@ public class CountryControllers {
 	@Autowired
 	private CountryService countryService;
 	
+	/**
+	 * this controller is used for fetch All the Countries.
+	 * @return Get List of All Countries.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@GetMapping("/all")
 	public List<Country> getAllCountries(){

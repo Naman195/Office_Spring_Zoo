@@ -36,6 +36,13 @@ import com.example.naman.repositories.AnimalRepository;
 import com.example.naman.repositories.TransferHistoryRepository;
 import com.example.naman.repositories.ZooRepository;
 
+/**
+ * Animal Service
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+ * */
+
 @Service
 public class AnimalService {
 
@@ -53,6 +60,14 @@ public class AnimalService {
 	
 	@Value("${file.upload-dir}")
     private String uploadDir;
+	
+	/**
+	 * this method is used for Add New Animal in a Zoo.
+	 * @param animalJSON, animalImage.
+	 * @return "Animal added successfully"
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public void addAnimal(CreateAnimalDTO animal, MultipartFile image)
 	{
@@ -75,8 +90,16 @@ public class AnimalService {
 
 	    }
 		
-		
 	}
+	
+	
+	/**
+	 * this method is used for save Image in the Upload Directory.
+	 * @param image
+	 * @return FileName
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 private String saveImage(MultipartFile image) throws IOException {
 		
@@ -97,7 +120,14 @@ private String saveImage(MultipartFile image) throws IOException {
 		return fileName.toString();	
 	}
 	
-	
+	/**
+	 * this method is used for fetch All Animals via ZooId
+	 * @param pageable
+	 * @return List of Animals Of Pageable
+	 * 
+	 * @author Naman Arora
+	 * */
+
 	public Page<Animal> getAllAnimals(Pageable pageable)
 	{
 		return animalRepository.findByArchievedFalse(pageable);	
@@ -119,12 +149,28 @@ private String saveImage(MultipartFile image) throws IOException {
 		
 	}
 	
+	/**
+	 * this method is used for get Animal By AnimalId
+	 * @param animalId
+	 * @return AnimalresponseDTO Animal;
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	public AnimalResponseDTO getAnimalById(Long id)
 	{
 		Animal animal =  animalRepository.findById(id).filter(ani -> !ani.isArchieved())
 				.orElseThrow(() -> new ResourceNotFoundException("Animal  Not Found"));
 		return modelMapper.map(animal, AnimalResponseDTO.class);
 	}
+	
+	/**
+	 * this method is used for Archieved the Animal.
+	 * @param animalId
+	 * @return void
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public void deletedAnimal(Long id)
 	{
@@ -133,6 +179,14 @@ private String saveImage(MultipartFile image) throws IOException {
 		ani.setArchieved(true); 
 		animalRepository.save(ani);
 	}
+	
+	/**
+	 * this method is used for Update New Animal in a Zoo.
+	 * @param updateAnimalDTO, animalImage, id.
+	 * @return AnimalResponseDTO
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public AnimalResponseDTO updateAnimalById(CreateAnimalDTO updateAnimalDTO, MultipartFile image,  Long id) throws IOException
 	{
@@ -153,6 +207,14 @@ private String saveImage(MultipartFile image) throws IOException {
 	
 	}
 	
+	/**
+	 * this method is used for Search  Animal in a Zoo.
+	 * @param searchTerm, zooId.
+	 * @return Animal List.
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	 public List<Animal> searchByNameOrType(String searchTerm, Long zooId) {
 	        List<Animal> allAni =  animalRepository.findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
 	                searchTerm, searchTerm, zooId);
@@ -167,6 +229,13 @@ private String saveImage(MultipartFile image) throws IOException {
 	        
 	    }
 	 
+	 /**
+		 * this controller is used for fetchAllZooExceptCurrent.
+		 * @param zooid
+		 * @return ZooList
+		 * 
+		 * @author Naman Arora
+		 * */
 	 
 	 public List<ZooResponseDTO> getAllZooExceptCurrentZoo(Long id){
 		List<ZooResponseDTO> allZoo = zooRepository.findAllByZooIdNotAndArchievedFalse(id)
@@ -178,6 +247,13 @@ private String saveImage(MultipartFile image) throws IOException {
 		 
 	 }
 	 
+	 /**
+		 * this controller is used for transfer Animal from currentZoo to new Zoo.
+		 * @param animalId, newZooId.
+		 * @return AnimalResponseDTO
+		 * 
+		 * @author Naman Arora
+		 * */
 	 
 	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
 		 
@@ -211,6 +287,14 @@ private String saveImage(MultipartFile image) throws IOException {
 		 
 			 
 	 }
+	 
+	 /**
+		 * this method is used for get Animal Transfer History.
+		 * @param animalId.
+		 * @return AnimalTransferHistory.
+		 * 
+		 * @author Naman Arora
+		 * */
 	 
 	 
 	 public ResponseEntity<?> animalTransferHistory(Long animalId) {

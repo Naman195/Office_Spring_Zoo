@@ -33,6 +33,14 @@ import com.example.naman.services.ZooService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
+/**
+ * Animal Controller
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+ * */
+
 @RestController
 @RequestMapping("/animal")
 public class AnimalController {
@@ -45,6 +53,15 @@ public class AnimalController {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	
+	/**
+	 * this controller is used for Add New Animal in a Zoo.
+	 * @param animalJSON, animalImage.
+	 * @return "Animal added successfully"
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@PreAuthorize("hasAuthority('create')")	
 	@PostMapping(value="/add", consumes = { "multipart/form-data" })
@@ -67,9 +84,15 @@ public class AnimalController {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 	    }
 		
-		
-			
 	}
+	
+	/**
+	 * this controller is used for fetch All Animals via ZooId
+	 * @param page, size, zooId.
+	 * @return List of Animals
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@GetMapping("/all/{id}")
 	public ResponseEntity<Page<AnimalResponseDTO>> getAnimalsByZooId(@RequestParam (defaultValue = "0") int page, @RequestParam (defaultValue = "3") int size, @PathVariable Long id){
@@ -78,11 +101,27 @@ public class AnimalController {
 		return ResponseEntity.ok(animals);
 	}
 	
+	/**
+	 * this controller is used for get Animal By AnimalId
+	 * @param animalId
+	 * @return AnimalresponseDTO Animal;
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<AnimalResponseDTO> getAnimalById(@PathVariable Long id)
 	{
 		return ResponseEntity.ok(animalService.getAnimalById(id));
 	}
+	
+	/**
+	 * this controller is used for Archieved the Animal.
+	 * @param animalId
+	 * @return "Animal Deleted successfully"
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@PreAuthorize("hasAuthority('delete')")
 	@PatchMapping("/delete/{id}")
@@ -91,6 +130,15 @@ public class AnimalController {
 		animalService.deletedAnimal(id);
 		return "Animal Deleted SuccessFully";
 	}
+	
+	
+	/**
+	 * this controller is used for Update New Animal in a Zoo.
+	 * @param animalJSON, animalImage.
+	 * @return AnimalResponse Aniimal
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@PreAuthorize("hasAuthority('update')")
 	@PatchMapping(value = "/update/{id}", consumes = { "multipart/form-data" })
@@ -111,25 +159,55 @@ public class AnimalController {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 	    }
 		
-		
 	}
+	
+	/**
+	 * this controller is used for Search  Animal in a Zoo.
+	 * @param searchTerm, zooId.
+	 * @return Animal List.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	 @GetMapping("/search")
 	    public List<Animal> searchByNameOrType(@RequestParam String searchTerm, @RequestParam Long zooId) {
 	        return animalService.searchByNameOrType(searchTerm, zooId);
 	    }
 	 
+		/**
+		 * this controller is used for fetchAllZooExceptCurrent.
+		 * @param zooid
+		 * @return ZooList
+		 * 
+		 * @author Naman Arora
+		 * */
 	 
 	 @GetMapping("getzoolist/{zooid}")
 	 public ResponseEntity<List<ZooResponseDTO>> findAllZooExceptCurrent(@PathVariable Long zooid){
 		 return ResponseEntity.ok(animalService.getAllZooExceptCurrentZoo(zooid));
 	 }
 	 
+		/**
+		 * this controller is used for transfer Animal from currentZoo to new Zoo.
+		 * @param animalId, newZooId.
+		 * @return "Animal Transferred SuccessFully".
+		 * 
+		 * @author Naman Arora
+		 * */
+	 
 	 @PreAuthorize("hasAuthority('transfer')")
 	 @PatchMapping("/transfer/{animalid}/to/{newzooid}")
 	 public ResponseEntity<AnimalResponseDTO> TransferAnimal(@PathVariable Long animalid, @PathVariable Long newzooid){
 		 return ResponseEntity.ok(animalService.transferAnimal(animalid, newzooid));
 	 }
+	 
+		/**
+		 * this controller is used for get Animal Transfer History.
+		 * @param animalId.
+		 * @return AnimalTransferHistory.
+		 * 
+		 * @author Naman Arora
+		 * */
 	 
 	 @PreAuthorize("hasAuthority('transfer')")
 	 @GetMapping("/history/{animalId}")

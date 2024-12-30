@@ -37,6 +37,15 @@ import com.example.naman.utils.OtpHelper;
 
 import jakarta.transaction.Transactional;
 
+/** 
+ * user Service
+ * 
+ * @author Naman Arora
+ * 
+ * @since 30-dec-2024
+ * 
+ * */
+
 @Service
 public class UserService {
 
@@ -72,6 +81,15 @@ public class UserService {
     private String uploadDir;
 	
 	
+	/**
+	 * this method is used for create new User.
+	 * 
+	 * @param userDTO and Image
+	 * @return void
+	 * @author Naman Arora
+	 * 
+	  */
+	
 	@Transactional
 	public void createUser(CreateUserDTO userDTO, MultipartFile image) {
 		
@@ -103,24 +121,41 @@ public class UserService {
 		
 	}
 	
-private String saveImage(MultipartFile image) throws IOException {
+	/** 
+	 * this method is used  for save Image in the Upload Directory.
+	 * @param image
+	 * @return fileName
+	 * 
+	 * @author Naman Arora
+	 * */
+		private String saveImage(MultipartFile image) throws IOException
+		{
 		
-		if (image.isEmpty()) {
-			throw new IllegalArgumentException("Image file is empty");
-		}
-		
-		
-		Path uploadPath = Paths.get(uploadDir);
-		if (!Files.exists(uploadPath)) {
-			Files.createDirectories(uploadPath);
-		}
-		
-		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-		Path filePath = uploadPath.resolve(fileName);
-		Files.write(filePath, image.getBytes());
-
-		return fileName.toString();	
+			if (image.isEmpty()) {
+				throw new IllegalArgumentException("Image file is empty");
+			}
+			
+			
+			Path uploadPath = Paths.get(uploadDir);
+			if (!Files.exists(uploadPath)) {
+				Files.createDirectories(uploadPath);
+			}
+			
+			String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
+			Path filePath = uploadPath.resolve(fileName);
+			Files.write(filePath, image.getBytes());
+	
+			return fileName.toString();	
 	}
+		
+		
+		/**
+		 * this  method is used for User LoggedIn
+		 * 
+		 * @param username, password
+		 * @return UserResponse Type DTO details.
+		 * @author Naman Arora
+		 *  */
 	
 	public UserResponse loginUser(String username, String password) {
 	    User user = userRepository.findByuserName(username)
@@ -140,18 +175,29 @@ private String saveImage(MultipartFile image) throws IOException {
 	    return new UserResponse(user.getUserId(), user.getUsername(), "", "User LoggedIn SuccessFully", userResponse);
 	}
 	
+	/** 
+	 * this method is used for fetch the List of All Registered Users.
+	 * @return get List of all Users.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
-	public List<ResponseUserDTO> getAllUser(){
+	public List<ResponseUserDTO> getAllUser()
+	{
 		List<User> users =  userRepository.findAll();
-		
 		List<User> filteredusers = 	users.stream().filter(user -> !user.isArchieved()).collect(Collectors.toList());
-		
-		
 		return filteredusers.stream()
 				.map(user -> modelMapper.map(user, ResponseUserDTO.class)).collect(Collectors.toList());
-		
 	}
 	
+	/**
+	 * this method is used for Get fetch User By ID;
+	 * 
+	 * @param UserId
+	 * @return Get Response of User (UserResponse).
+	 * 
+	 * @author Naman Arora.
+	 *  */
 	
 	public ResponseUserDTO getUserById(Long id) {
 	    User existingUser = userRepository.findById(id)
@@ -162,10 +208,27 @@ private String saveImage(MultipartFile image) throws IOException {
 
 	}
 	
+	/**
+	 * this method is used for Find User By Username.
+	 * @param username
+	 * @return User
+	 * 
+	 * @author Naman Arora 
+	 * */
+	
 	public User findByUsername(String username) {
 		return userRepository.findByuserName(username)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	    }
+	
+	/**
+	 * this method is used for Update the User Details.
+	 * 
+	 * @param userId,  userData and user Image
+	 * @return Return the Updated User.
+	 * 
+	 * @author Naman Arora.
+	 * */
 	
 	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto, MultipartFile image) throws IOException {
 	        
@@ -196,13 +259,30 @@ private String saveImage(MultipartFile image) throws IOException {
 	         return res;
 	    }
 	
+		/** 
+		 * this method is used for Archieved the User.
+		 * @param usedId
+		 * @return void
+		 * 
+		 *  @author Naman Arora.
+		 * */
+	 
 	 public void deleteUserById(Long id) {
 	        User user = userRepository.findById(id)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 	        user.setArchieved(true);
 	        userRepository.save(user);
 	    }
-	
+	 
+	 /**
+		 * this method is used when user forgot their Password.
+		 * @param email
+		 * @return  email and message as a response.
+		 * 
+		 * @author Naman Arora.
+		 * */
+
+	 
 	 public ResponseEntity<Map<String, String>> forgotPassword(String email) {
 	        User user = userRepository.findByEmail(email)
 	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email is not valid"));
@@ -219,7 +299,14 @@ private String saveImage(MultipartFile image) throws IOException {
 	        return ResponseEntity.ok(response);
 	    }
 	 
-	 
+	 /**
+		 * 
+		 * this method is used for verify Otp entered by user.
+		 * @param email, otp
+		 * @return get response as message and url for setPass in key-value pair.
+		 * 
+		 * @author Naman Arora.
+		 * */
 	 
 	 public ResponseEntity<Map<String, String>> verifyOtp(String email, String otp){
 		 boolean isValid = 	otpHelper.validateOtp(email, otp);
@@ -245,7 +332,14 @@ private String saveImage(MultipartFile image) throws IOException {
 	 }
 	
 	 
-	
+	 /**
+		 * this method is used for set new password.
+		 * @param tokenHeader , newPassword, oldPassword
+		 * @return Message ("Password Update successfully")
+		 * 
+		 * @author Naman Arora
+		 * */
+	 
 	public String setPassword(String tokenHeader, String newPassword, String oldPassword) {
         
 		if(newPassword == null || newPassword.length() < 6) {

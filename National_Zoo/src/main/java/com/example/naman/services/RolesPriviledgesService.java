@@ -11,11 +11,26 @@ import org.springframework.stereotype.Service;
 import com.example.naman.entities.Roles;
 import com.example.naman.repositories.RolesPriviledgesRepository;
 
+/**
+ * RolePriviledges Service
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+ * */
 @Service
 public class RolesPriviledgesService
 {
 	@Autowired
 	private RolesPriviledgesRepository  rolesPriviledgesRepository;
+	
+	/**
+	 * this method is used for getPriviledgeForRole
+	 * @param Roles
+	 * @return List<GrantedAuthority>
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	
 	public List<GrantedAuthority>  getPriviledgeForRole(Roles role) 
 	{

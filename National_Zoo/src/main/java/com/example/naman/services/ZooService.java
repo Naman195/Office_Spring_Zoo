@@ -28,6 +28,12 @@ import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.ZooRepository;
 
+/**
+ * Zoo Service
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+  */
 
 @Service
 public class ZooService {
@@ -44,7 +50,13 @@ public class ZooService {
 	@Value("${file.upload-dir}")
     private String uploadDir;
 	
-	
+	/**
+	 * this controller is used for Add New Zoo
+	 * @param zoo, Image.
+	 * @return void
+	 * 
+	 * @author Naman Arora
+	 * */
 
 	public void createZoo(CreateZooDTO zoo, MultipartFile image)
 	{
@@ -63,6 +75,15 @@ public class ZooService {
 
 	    }
 	}
+	
+	/**
+	 * this method is used to saveImage in the Upload directory
+	 * @param image
+	 * @return fileName
+	 * 
+	 * @author Naman Arora
+	 * */
+
 	
 	private String saveImage(MultipartFile image) throws IOException {
 		
@@ -83,7 +104,13 @@ public class ZooService {
 		return fileName.toString();	
 	}
 	
-	
+	/**
+	 * this controller is used for get all Zoo List
+	 * @param pageable
+	 * @return List of Zoo as a Pagination Response.
+	 * 
+	 * @author Naman Arora
+	 * */
 	public Page<ZooResponseDTO> getAllZoo(Pageable pageable)
 	{  
 	    Page<Zoo> allZoo = zooRepository.findByArchievedFalse(pageable);
@@ -95,6 +122,13 @@ public class ZooService {
 	    return new PageImpl<>(zooResponseDTOs, pageable, allZoo.getTotalElements());
 	}
 
+	/**
+	 * this method is used for getZoo By Id.
+	 * @param ZooId.
+	 * @return ZooResponseDTO Zoo
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public ZooResponseDTO getZooById(Long id)
 	{
@@ -104,11 +138,27 @@ public class ZooService {
 		return modelMapper.map(zoo, ZooResponseDTO.class);
 	}
 	
+	/**
+	 * this method is used for achieved the Zoo.
+	 * @param ZooId
+	 * @return void
+	 * 
+	 * @author Naman Arora
+	 * */
+	
 	public void deleteZooById(Long id) {
 		Zoo zoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
 		zoo.setArchieved(true);
 		zooRepository.save(zoo);
 	}
+	
+	/**
+	 * this controller is used for update the details of Zoo.
+	 * @param zooid,  Updatedzoo, UpdatedzooImage.
+	 * @return Updated ZooresponseDTO Zoo.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, MultipartFile image,  Long id) throws IOException
 	{
@@ -134,6 +184,13 @@ public class ZooService {
 		return modelMapper.map(updatedZoo, ZooResponseDTO.class);
 	}
 	
+	/**
+	 * this method is used for Search  a Zoo
+	 * @param searchItem
+	 * @return ZooList 
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public List<ZooResponseDTO> searchByNameOrLocation(String searchItem){
 		

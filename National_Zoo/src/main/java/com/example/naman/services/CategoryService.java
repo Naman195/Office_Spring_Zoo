@@ -10,6 +10,12 @@ import org.springframework.stereotype.Service;
 import com.example.naman.DTOS.CategoryRepositoryDTO;
 import com.example.naman.entities.CategoryTypes;
 import com.example.naman.repositories.CategoryRepository;
+/**
+ * Category Service
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+ * */
 
 @Service
 public class CategoryService {
@@ -19,6 +25,13 @@ public class CategoryService {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
+	/**
+	 * fetch All categories.
+	 * @return Get All categories.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	public List<CategoryRepositoryDTO> getAllcategory()
 	{

@@ -12,6 +12,12 @@ import com.example.naman.DTOS.RoleResponseDTO;
 import com.example.naman.services.RolesService;
 
 
+/**
+ * Roles Controller
+ * @author Naman Arora
+ *
+ * @since 30-dec-2024
+ * */
 
 @RestController
 @RequestMapping("/role")
@@ -19,6 +25,14 @@ public class RolesController {
 	
 	@Autowired
 	private RolesService rolesService;
+	
+	/**
+	 * this controller is used for fetch roles;
+	 * 
+	 * @return list of Role.
+	 * 
+	 * @author Naman Arora
+	 * */
 	
 	@GetMapping("/all")
 	public ResponseEntity<List<RoleResponseDTO>> getRole()
