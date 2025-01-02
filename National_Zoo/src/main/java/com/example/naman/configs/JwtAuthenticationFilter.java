@@ -16,9 +16,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import com.example.naman.entities.Token;
+import com.example.naman.repositories.TokenRepository;
 import com.example.naman.services.JwtService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -26,15 +29,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenRepository tokenRepository;
 
     public JwtAuthenticationFilter(
         JwtService jwtService,
         UserDetailsService userDetailsService,
-        HandlerExceptionResolver handlerExceptionResolver
+        HandlerExceptionResolver handlerExceptionResolver,
+        TokenRepository tokenRepository
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -60,14 +66,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
-                    );
+                	 Token token = tokenRepository.findByTokenValue(jwt);
+                	 if(token != null && token.getExpiresAt().isAfter(LocalDateTime.now())) {
+                		 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                 userDetails,
+                                 null,
+                                 userDetails.getAuthorities()
+                         );
+                		 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                         SecurityContextHolder.getContext().setAuthentication(authToken);
+                	 } else {
+                		 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
+                         return;
+                	 }
+                    
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    
                 }
             }
 
