@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.naman.entities.Priviledges;
 import com.example.naman.entities.User;
+import com.example.naman.enums.MessageResponse;
 import com.example.naman.repositories.UserRepository;
 
 
@@ -43,7 +44,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
-		User user = userRepository.findByuserName(username).orElseThrow(()-> new RuntimeException("Username is not Valid"));
+		User user = userRepository.findByuserName(username).orElseThrow(()-> new RuntimeException(MessageResponse.INVALID_USERNAME.getMessage()));
 		
 		user.setAuthority(rolesPriviledgesService.getPriviledgeForRole(user.getRole()));
 		

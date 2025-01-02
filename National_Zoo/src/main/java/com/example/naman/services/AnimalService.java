@@ -31,6 +31,7 @@ import com.example.naman.entities.Animal;
 import com.example.naman.entities.TransferHistory;
 import com.example.naman.entities.User;
 import com.example.naman.entities.Zoo;
+import com.example.naman.enums.MessageResponse;
 import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.AnimalRepository;
 import com.example.naman.repositories.TransferHistoryRepository;
@@ -80,9 +81,6 @@ public class AnimalService {
 			
 		 animalRepository.save(addAnimal);
 			
-//			AnimalResponseDTO responseDTO = modelMapper.map(savedAnimal, AnimalResponseDTO.class);
-//			return responseDTO;
-			
 		} catch (IOException e) {
 	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
 	    }  catch (Exception e) {
@@ -104,7 +102,7 @@ public class AnimalService {
 private String saveImage(MultipartFile image) throws IOException {
 		
 		if (image.isEmpty()) {
-			throw new IllegalArgumentException("Image file is empty");
+			throw new IllegalArgumentException(MessageResponse.IMAGE_NULL.getMessage());
 		}
 		
 		
@@ -160,7 +158,7 @@ private String saveImage(MultipartFile image) throws IOException {
 	public AnimalResponseDTO getAnimalById(Long id)
 	{
 		Animal animal =  animalRepository.findById(id).filter(ani -> !ani.isArchieved())
-				.orElseThrow(() -> new ResourceNotFoundException("Animal  Not Found"));
+				.orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
 		return modelMapper.map(animal, AnimalResponseDTO.class);
 	}
 	
@@ -175,7 +173,7 @@ private String saveImage(MultipartFile image) throws IOException {
 	public void deletedAnimal(Long id)
 	{
 		
-		Animal ani = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Animal  Not Found"));
+		Animal ani = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
 		ani.setArchieved(true); 
 		animalRepository.save(ani);
 	}
@@ -190,11 +188,11 @@ private String saveImage(MultipartFile image) throws IOException {
 	
 	public AnimalResponseDTO updateAnimalById(CreateAnimalDTO updateAnimalDTO, MultipartFile image,  Long id) throws IOException
 	{
-		Animal existingAnimal = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Animal  Not Found"));
+		Animal existingAnimal = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
 		String oldImageName = existingAnimal.getImage();
 		modelMapper.map(updateAnimalDTO, existingAnimal);
 		Long zooId = updateAnimalDTO.getZoo().getZooId();
-		Zoo zoo = zooRepository.findById(zooId).orElseThrow(() -> new ResourceNotFoundException("Zoo not found with ID: " + zooId));
+		Zoo zoo = zooRepository.findById(zooId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage() + zooId));
 		existingAnimal.setZoo(zoo);
 		if(image != null && !image.isEmpty()) {
 			String imageName = saveImage(image);
@@ -257,9 +255,9 @@ private String saveImage(MultipartFile image) throws IOException {
 	 
 	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
 		 
-		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException("AnimalId is not Valid"));
+		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
 		 
-		 Zoo newZoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException("Zoo  Not Found with ZooId"));
+		 Zoo newZoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage()));
 		 
 		 Zoo currentZoo = animal.getZoo(); // get CurrentZoo where Animal Belongs.
 		 
@@ -301,7 +299,7 @@ private String saveImage(MultipartFile image) throws IOException {
 		    List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
 
 		    if (historyList.isEmpty()) {
-		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Transfer Hisory Found for this Animal");
+		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MessageResponse.TRANSFERHISTORYNOTFOUND.getMessage());
 		    }
 		    
 		    AnimalResponseDTO animal = new AnimalResponseDTO();

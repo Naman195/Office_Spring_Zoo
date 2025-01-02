@@ -29,9 +29,12 @@ import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.Address;
 import com.example.naman.entities.City;
 import com.example.naman.entities.Roles;
+import com.example.naman.entities.Token;
 import com.example.naman.entities.User;
+import com.example.naman.enums.MessageResponse;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.RoleRepository;
+import com.example.naman.repositories.TokenRepository;
 import com.example.naman.repositories.UserRepository;
 import com.example.naman.utils.OtpHelper;
 
@@ -76,6 +79,9 @@ public class UserService {
 	@Autowired
 	 private JavaSmtpGmailSenderService senderService;
 	
+	@Autowired
+	private TokenRepository tokenRepository;
+	
 		
 	@Value("${file.upload-dir}")
     private String uploadDir;
@@ -91,19 +97,16 @@ public class UserService {
 	  */
 	
 	@Transactional
-	public void createUser(CreateUserDTO userDTO, MultipartFile image) {
+	public void createUser(CreateUserDTO userDTO, MultipartFile image)
+		{
 		
 		try {
 			if (userRepository.findByuserName(userDTO.getUserName()).isPresent()) {
 		        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 		    }
 			
-//			if(userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-//				throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
-//			}
-			
-			User user = modelMapper.map(userDTO, User.class);
-			Roles role = roleRepository.findById(userDTO.getRoleId()).get();
+			User user = modelMapper.map(userDTO, User.class); // convert user DTO  to User Class
+			Roles role = roleRepository.findById(userDTO.getRoleId()).get(); 
 			user.setRole(role);
 			String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
 			user.setPassword(password);
@@ -132,17 +135,17 @@ public class UserService {
 		{
 		
 			if (image.isEmpty()) {
-				throw new IllegalArgumentException("Image file is empty");
+				throw new IllegalArgumentException(MessageResponse.IMAGE_NULL.getMessage());
 			}
 			
 			
 			Path uploadPath = Paths.get(uploadDir);
 			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
+				Files.createDirectories(uploadPath); // if directory is not available Make it.
 			}
 			
 			String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
-			Path filePath = uploadPath.resolve(fileName);
+			Path filePath = uploadPath.resolve(fileName); 
 			Files.write(filePath, image.getBytes());
 	
 			return fileName.toString();	
@@ -172,7 +175,14 @@ public class UserService {
 	    ResponseUserDTO userResponse = modelMapper.map(user, ResponseUserDTO.class);
 	    
 
-	    return new UserResponse(user.getUserId(), user.getUsername(), "", "User LoggedIn SuccessFully", userResponse);
+	    return new UserResponse(user.getUserId(), user.getUsername(), "", MessageResponse.LOGGEDIN_USER.getMessage(), userResponse);
+	}
+	
+	public String logOut(String tokenHeader) {
+		String tokenValue = tokenHeader.substring(7);
+		Token token = tokenRepository.findByTokenValue(tokenValue);
+		 tokenRepository.delete(token);
+		 return "User Loggedout Successfully";
 	}
 	
 	/** 
@@ -218,7 +228,7 @@ public class UserService {
 	
 	public User findByUsername(String username) {
 		return userRepository.findByuserName(username)
-	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
 	    }
 	
 	/**
@@ -233,7 +243,7 @@ public class UserService {
 	 public ResponseUserDTO partialUpdateUserById(Long id, UpdateUserDTO dto, MultipartFile image) throws IOException {
 	        
 	        User user = userRepository.findById(id)
-	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
 
 	        
 	        user.setFullName(dto.getFullName());
@@ -245,7 +255,7 @@ public class UserService {
 	            address.setZipCode(addressDTO.getZipCode());
 
 	            City city = cityRepository.findById(addressDTO.getCity().getCityId())
-	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
+	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.CITYNOTFOUND.getMessage()));
 	            address.setCity(city);
 	        }
 	        
@@ -269,7 +279,7 @@ public class UserService {
 	 
 	 public void deleteUserById(Long id) {
 	        User user = userRepository.findById(id)
-	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
 	        user.setArchieved(true);
 	        userRepository.save(user);
 	    }
@@ -285,7 +295,7 @@ public class UserService {
 	 
 	 public ResponseEntity<Map<String, String>> forgotPassword(String email) {
 	        User user = userRepository.findByEmail(email)
-	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email is not valid"));
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.INVALID_EMAIL.getMessage()));
 
 	        String otp = otpHelper.generateOtp();
 	        otpHelper.storeOtp(user.getEmail(), otp);
@@ -294,7 +304,7 @@ public class UserService {
 	        
 	        Map<String, String> response = new HashMap<>();
 	        response.put("email", user.getEmail());
-	        response.put("message", "OTP sent to your email");
+	        response.put("message", MessageResponse.OTPSENT.getMessage());
 	        
 	        return ResponseEntity.ok(response);
 	    }
@@ -312,7 +322,7 @@ public class UserService {
 		 boolean isValid = 	otpHelper.validateOtp(email, otp);
 		 
 		 if(isValid) {
-			 User user = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User  not found"));
+			 User user = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
 			 
 			 String forgotPasswordToken = jwtService.generateToken(user);
 			 
@@ -322,11 +332,11 @@ public class UserService {
 		        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
 		        
 		        Map<String, String> response = new HashMap<>();
-		        response.put("message", "OTP verified successfully");
+		        response.put("message", MessageResponse.OTPVERIFY.getMessage());
 		        response.put("url", resetPasswordUrl);
 		        return ResponseEntity.ok(response);
 		    } else {
-		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message" ,"Invalid or expired OTP"));
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message" ,MessageResponse.OTPEXPIRE.getMessage()));
 		    }
 		 
 	 }
@@ -343,7 +353,7 @@ public class UserService {
 	public String setPassword(String tokenHeader, String newPassword, String oldPassword) {
         
 		if(newPassword == null || newPassword.length() < 6) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password must be at least 6 characters long");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
 		}
 		
 		
@@ -356,16 +366,16 @@ public class UserService {
         
         
         User user = userRepository.findByuserName(username)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
 
         if(oldPassword != null && !bcryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
-        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is incorrect");
+        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.INCORRECT_PASSWORD.getMessage());
         }
         
         user.setPassword(bcryptPasswordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        return "Password updated successfully";
+        return MessageResponse.UPDATE_PASSWORD.getMessage();
     }
 	
 	

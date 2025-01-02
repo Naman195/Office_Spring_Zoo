@@ -1,6 +1,7 @@
 package com.example.naman.controllers;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,10 @@ import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.SetPasswordRequest;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
+import com.example.naman.entities.Token;
 import com.example.naman.entities.User;
+import com.example.naman.enums.MessageResponse;
+import com.example.naman.repositories.TokenRepository;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,6 +68,9 @@ public class UserController {
 	@Autowired
 	private Validator validator;
 	
+	@Autowired
+	private TokenRepository tokenRepository;
+	
 	/**
 	 * this controller is used for create new User.
 	 * 
@@ -91,9 +98,9 @@ public class UserController {
 		        }
 		        
 			userService.createUser(user, file);
-			return ResponseEntity.status(HttpStatus.CREATED).body("User successfully created");
+			return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.REGISTERED_USER.getMessage());
 		}catch (JsonProcessingException e) {
-	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	        return ResponseEntity.badRequest().body(MessageResponse.JSON_INVALID.getMessage() + e.getMessage());
 	    } catch (ResponseStatusException e) {
 			String errorMessage = e.getReason();
 
@@ -120,7 +127,11 @@ public class UserController {
 			UserResponse authenticatedUser = userService.loginUser(credentials.getUsername(), credentials.getPassword());
 			User user = userService.findByUsername(credentials.getUsername());
 			String jwtToken = jwtService.generateToken(user);
+			
 			authenticatedUser.setToken(jwtToken);
+			
+			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(LocalDateTime.now().plusHours(2)).build();
+			tokenRepository.save(token);		
 			return ResponseEntity.ok(authenticatedUser);
 		} catch (ResponseStatusException e) {
 
@@ -131,6 +142,11 @@ public class UserController {
 			errorResponse.setMessage(errorMessage); 
 			return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
 		}
+	}
+	
+	@PostMapping("/logout")
+	public String logout(@RequestHeader("Authorization") String tokenHeader) {
+		return userService.logOut(tokenHeader);
 	}
 	
 	/** 
@@ -187,7 +203,7 @@ public class UserController {
 			ResponseUserDTO updatedUser = userService.partialUpdateUserById(id, user, file);
 			return ResponseEntity.ok(updatedUser);
 		} catch (JsonProcessingException e) {
-	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	        return ResponseEntity.badRequest().body(MessageResponse.JSON_INVALID.getMessage() + e.getMessage());
 	    } catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partial update failed: " + e.getMessage());
 		}
@@ -206,9 +222,9 @@ public class UserController {
 	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		try {
 			userService.deleteUserById(id);
-			return ResponseEntity.ok("User deleted successfully");
+			return ResponseEntity.ok(MessageResponse.USERDELETE.getMessage());
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User deletion failed: " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MessageResponse.USERDELETIONFAILED.getMessage() + e.getMessage());
 		}
 	}
 	
@@ -245,7 +261,7 @@ public class UserController {
 		try {
 			return userService.verifyOtp(request.getEmail(), request.getOtp());
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message","Otp Verification FAiled: " + e.getMessage()));
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", MessageResponse.OTPVERIFYFAILED.getMessage() + e.getMessage()));
 		}
 	}
 

@@ -27,7 +27,7 @@ public class JavaSmtpGmailSenderService {
 	
 	 public void sendEmail(String toEmail, String subject, String body){
 	        SimpleMailMessage message = new SimpleMailMessage();
-	        message.setFrom("amanarora19599@gmail.com");
+	        message.setFrom("naman.arora1905@gmail.com");
 	        message.setTo(toEmail);
 	        message.setSubject(subject);
 	        message.setText(body);

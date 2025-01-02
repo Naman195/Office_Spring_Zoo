@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
+import com.example.naman.enums.MessageResponse;
 import com.example.naman.services.ZooService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,9 +65,9 @@ public class ZooController {
 	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
 	     
 	        zooService.createZoo(zoo, file);
-	        return ResponseEntity.ok("Zoo created successfully!");	
+	        return ResponseEntity.ok(MessageResponse.CREATE_ZOO.getMessage());	
 	    } catch (JsonProcessingException e) {
-	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	        return ResponseEntity.badRequest().body(MessageResponse.JSON_INVALID.getMessage() + e.getMessage());
 	    } catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 	    }
@@ -117,7 +118,7 @@ public class ZooController {
 	public String deleteZoo(@PathVariable Long id) 
 	{
 		zooService.deleteZooById(id);
-		return "Zoo Deleted SuccessFully";
+		return MessageResponse.DELETE_ZOO.getMessage();
 	}
 	
 	/**
@@ -139,7 +140,7 @@ public class ZooController {
 	        CreateZooDTO zoo = objectMapper.readValue(zooJson, CreateZooDTO.class);
 			return ResponseEntity.ok(zooService.updateZooById(zoo, file, id));
 		} catch (JsonProcessingException e) {
-	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	        return ResponseEntity.badRequest().body(MessageResponse.JSON_INVALID.getMessage() + e.getMessage());
 	    }
 		catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());

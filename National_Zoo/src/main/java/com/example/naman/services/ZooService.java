@@ -24,6 +24,7 @@ import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Address;
 import com.example.naman.entities.City;
 import com.example.naman.entities.Zoo;
+import com.example.naman.enums.MessageResponse;
 import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.CityRepository;
 import com.example.naman.repositories.ZooRepository;
@@ -88,7 +89,7 @@ public class ZooService {
 	private String saveImage(MultipartFile image) throws IOException {
 		
 		if (image.isEmpty()) {
-			throw new IllegalArgumentException("Image file is empty");
+			throw new IllegalArgumentException(MessageResponse.IMAGE_NULL.getMessage());
 		}
 		
 		
@@ -134,7 +135,7 @@ public class ZooService {
 	{
 		Zoo zoo =  zooRepository.findById(id)
 				.filter(z -> !z.isArchieved())
-				.orElseThrow(() ->  new ResourceNotFoundException("Zoo not found with ID: " + id));
+				.orElseThrow(() ->  new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage() + id));
 		return modelMapper.map(zoo, ZooResponseDTO.class);
 	}
 	
@@ -147,7 +148,7 @@ public class ZooService {
 	 * */
 	
 	public void deleteZooById(Long id) {
-		Zoo zoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
+		Zoo zoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage()));
 		zoo.setArchieved(true);
 		zooRepository.save(zoo);
 	}
@@ -162,7 +163,7 @@ public class ZooService {
 	
 	public ZooResponseDTO updateZooById(CreateZooDTO updateZooDTO, MultipartFile image,  Long id) throws IOException
 	{
-		Zoo existingZoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Zoo Not Found By Id"));
+		Zoo existingZoo = zooRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage()));
 		existingZoo.setZooName(updateZooDTO.getZooName());
 		Address address = existingZoo.getAddress();
 		AddressDTO addressDTO = updateZooDTO.getAddress();
@@ -171,7 +172,7 @@ public class ZooService {
 			address.setZipCode(addressDTO.getZipCode());
 			
 			City city = cityRepository.findById(addressDTO.getCity().getCityId())
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "City not found"));
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.CITYNOTFOUND.getMessage()));
 			address.setCity(city);			
 		}
 		

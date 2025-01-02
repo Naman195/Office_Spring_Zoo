@@ -28,6 +28,7 @@ import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
 import com.example.naman.entities.Zoo;
+import com.example.naman.enums.MessageResponse;
 import com.example.naman.services.AnimalService;
 import com.example.naman.services.ZooService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -76,10 +77,10 @@ public class AnimalController {
 			Animal animal = modelMapper.map(animalDTO, Animal.class);
 			animal.setZoo(zoo);
 			animalService.addAnimal(animalDTO, file);
-			return ResponseEntity.ok("Animal added successfully");	
+			return ResponseEntity.ok(MessageResponse.ADD_ANIMAL.getMessage());	
 			
 		} catch (JsonProcessingException e) {
-	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	        return ResponseEntity.badRequest().body(MessageResponse.JSON_INVALID.getMessage() + e.getMessage());
 	    } catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 	    }
@@ -128,7 +129,7 @@ public class AnimalController {
 	public String deleteAnimalById(@PathVariable Long id)
 	{
 		animalService.deletedAnimal(id);
-		return "Animal Deleted SuccessFully";
+		return MessageResponse.DELETE_ANIMAL.getMessage();
 	}
 	
 	
@@ -153,7 +154,7 @@ public class AnimalController {
 			return ResponseEntity.ok(animalService.updateAnimalById(animal, file,  id));
 			
 		} catch (JsonProcessingException e) {
-	        return ResponseEntity.badRequest().body("Invalid JSON format: " + e.getMessage());
+	        return ResponseEntity.badRequest().body(MessageResponse.JSON_INVALID.getMessage() + e.getMessage());
 	    }
 		catch (ResponseStatusException e) {
 	        return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
