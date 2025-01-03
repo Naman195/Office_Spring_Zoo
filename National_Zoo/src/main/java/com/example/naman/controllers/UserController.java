@@ -30,6 +30,7 @@ import com.example.naman.DTOS.ForgotPasswordRequestDTO;
 import com.example.naman.DTOS.OtpResponseDTO;
 import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.SetPasswordRequest;
+import com.example.naman.DTOS.UpdatePassworsDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.Token;
@@ -283,6 +284,11 @@ public class UserController {
 		} catch (ResponseStatusException e) {
 			return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
 		}
+	}
+	
+	@PostMapping("/updatepassword")
+	public String updatePass(@RequestBody UpdatePassworsDTO updatepass){
+		return userService.updatePassword(updatepass.getTokenKey(), updatepass.getNewPassword());
 	}
 
 }

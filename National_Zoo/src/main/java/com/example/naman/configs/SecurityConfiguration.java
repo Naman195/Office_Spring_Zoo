@@ -39,7 +39,7 @@ public class SecurityConfiguration {
         .formLogin((form) -> form.disable())
         .logout((logout) -> logout.disable())
         .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/auth/login", "/auth/create", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/role/all")
+                        .requestMatchers("/auth/login", "/auth/create", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/updatepassword",  "/role/all")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

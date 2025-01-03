@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -84,7 +83,7 @@ public class UserService {
 	@Autowired
 	private TokenRepository tokenRepository;
 	
-	private final Map<String, String> tokenStore = new ConcurrentHashMap<>();
+	private final Map<String, String> tokenStore = new HashMap<>();
 	
 		
 	@Value("${file.upload-dir}")
@@ -331,10 +330,9 @@ public class UserService {
 			 String forgotPasswordToken = jwtService.generateToken(user);
 			 
 
-			// Store the token in the temporary store with a unique key
-	            String uniqueKey = UUID.randomUUID().toString(); // Generate a unique key
+			
+	            String uniqueKey = UUID.randomUUID().toString(); 
 	            tokenStore.put(uniqueKey, forgotPasswordToken);
-			 
 			 
 		        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
 		        
@@ -342,6 +340,8 @@ public class UserService {
 		        response.put("message", MessageResponse.OTPVERIFY.getMessage());
 //		        response.put("url", resetPasswordUrl);
 		        response.put("key", uniqueKey);
+		        System.out.println(uniqueKey);
+		        System.out.println(tokenStore.keySet().toString());
 		        return ResponseEntity.ok(response);
 		    } else {
 		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message" ,MessageResponse.OTPEXPIRE.getMessage()));
@@ -358,40 +358,56 @@ public class UserService {
 		 * @author Naman Arora
 		 * */
 	 
-	public String setPassword(String tokenKey, String newPassword, String oldPassword) {
-		String forgotPasswordToken = tokenStore.get(tokenKey);
-        if (forgotPasswordToken == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired token");
-        }
-        
-		if(newPassword == null || newPassword.length() < 6) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
-		}
-		
-		
-//        if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token format");
-//        }
+	 public String setPassword(String tokenHeader, String newPassword, String oldPassword) {
+	        
+			if(newPassword == null || newPassword.length() < 6) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
+			}
+			
+	        if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid token format");
+	        }
 
-        String token = forgotPasswordToken.substring(7);
-        String username = jwtService.extractUsername(token);
-        
-        
-        User user = userRepository.findByuserName(username)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
+	        String token = tokenHeader.substring(7);
+	        String username = jwtService.extractUsername(token);
+	        
+	        
+	        User user = userRepository.findByuserName(username)
+	            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
 
-        if(oldPassword != null && !bcryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
-        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.INCORRECT_PASSWORD.getMessage());
-        }
-        
-        user.setPassword(bcryptPasswordEncoder.encode(newPassword));
-        userRepository.save(user);
+	        if(oldPassword != null && !bcryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
+	        	throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.INCORRECT_PASSWORD.getMessage());
+	        }
+	        
+	        user.setPassword(bcryptPasswordEncoder.encode(newPassword));
+	        userRepository.save(user);
 
-  
-        tokenStore.remove(tokenKey);
-
-        return MessageResponse.UPDATE_PASSWORD.getMessage();
-    }
+	        return MessageResponse.UPDATE_PASSWORD.getMessage();
+	    }
 	
+	 public String updatePassword(String tokenKey, String newPassword) {
+		 if(newPassword == null || newPassword.length() < 6) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
+			}
+		 String tokenValue = tokenStore.get(tokenKey);
+			 	 
+		 if (tokenValue == null ) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session Expire.");
+	        }
+
+	        String username = jwtService.extractUsername(tokenValue);
+	        
+	        User user = userRepository.findByuserName(username)
+	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
+	        
+	        user.setPassword(bcryptPasswordEncoder.encode(newPassword));
+	        userRepository.save(user);
+
+	        tokenStore.clear();
+	        
+	        return MessageResponse.UPDATE_PASSWORD.getMessage();
+
+	        
+	 }
 	
 }
