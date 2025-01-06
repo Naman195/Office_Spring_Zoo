@@ -178,7 +178,7 @@ public class UserService {
 	    ResponseUserDTO userResponse = modelMapper.map(user, ResponseUserDTO.class);
 	    
 
-	    return new UserResponse(user.getUserId(), user.getUsername(), "", MessageResponse.LOGGEDIN_USER.getMessage(), userResponse);
+	    return new UserResponse(user.getUserId(), user.getUsername(), "", MessageResponse.LOGGEDIN_USER.getMessage(), userResponse, "");
 	}
 	
 	public String logOut(String tokenHeader) {

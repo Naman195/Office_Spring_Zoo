@@ -1,6 +1,7 @@
 package com.example.naman.services;
 
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +30,8 @@ public class JwtService {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-    @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration;
+//    @Value("${security.jwt.expiration-time}")
+    private long jwtExpiration = 2*60*1000;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -80,10 +81,15 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-
+    
+    public LocalDateTime getExp(String token) {
+    Claims xy = extractAllClaims( token);
+    return  (LocalDateTime) xy.get("exp");
+    }
+    
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()

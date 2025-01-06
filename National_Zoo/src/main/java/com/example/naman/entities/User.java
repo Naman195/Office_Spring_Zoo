@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.naman.annotations.UniqueEmail;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -88,6 +89,10 @@ public class User implements UserDetails {
 	
 	private String image;
 	
+	@OneToOne(mappedBy = "user")
+	@JsonIgnore
+	private RefreshToken refreshToken;
+	
 	@LastModifiedBy
 	@Column(name = "updated_by", nullable = true, updatable = true)
 	private String updatedBy;
@@ -106,7 +111,7 @@ public class User implements UserDetails {
 
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
+		
 		return this.userName;
 	}
 

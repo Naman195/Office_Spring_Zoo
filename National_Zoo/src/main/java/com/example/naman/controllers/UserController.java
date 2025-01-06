@@ -28,16 +28,19 @@ import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.CredentialsDTO;
 import com.example.naman.DTOS.ForgotPasswordRequestDTO;
 import com.example.naman.DTOS.OtpResponseDTO;
+import com.example.naman.DTOS.RequestTokenreq;
 import com.example.naman.DTOS.ResponseUserDTO;
 import com.example.naman.DTOS.SetPasswordRequest;
 import com.example.naman.DTOS.UpdatePassworsDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
+import com.example.naman.entities.RefreshToken;
 import com.example.naman.entities.Token;
 import com.example.naman.entities.User;
 import com.example.naman.enums.MessageResponse;
 import com.example.naman.repositories.TokenRepository;
 import com.example.naman.services.JwtService;
+import com.example.naman.services.RefreshTokenService;
 import com.example.naman.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,6 +75,9 @@ public class UserController {
 	@Autowired
 	private TokenRepository tokenRepository;
 	
+	@Autowired
+	private RefreshTokenService refreshTokenService;
+	
 	/**
 	 * this controller is used for create new User.
 	 * 
@@ -93,7 +99,7 @@ public class UserController {
 		        Set<ConstraintViolation<CreateUserDTO>> violations = validator.validate(user);
 		        if(!violations.isEmpty()) {
 		        	String errorMessage = violations.stream().map(ConstraintViolation -> ConstraintViolation.getMessage()).collect(Collectors.joining(", "));
-		        	// String errorMessage = violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "));
+		        	
 		        	return
 		        ResponseEntity.badRequest().body(errorMessage);
 		        }
@@ -129,9 +135,13 @@ public class UserController {
 			User user = userService.findByUsername(credentials.getUsername());
 			String jwtToken = jwtService.generateToken(user);
 			
+			RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+			authenticatedUser.setRefreshToken(refreshToken.getRefreshToken());
 			authenticatedUser.setToken(jwtToken);
 			
-			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(LocalDateTime.now().plusHours(2)).build();
+			// save JWT Token in Database
+			Token token =  Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(LocalDateTime.now().plusHours(2)).build();
+//			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(jwtService.getExp(jwtToken)).build();
 			tokenRepository.save(token);		
 			return ResponseEntity.ok(authenticatedUser);
 		} catch (ResponseStatusException e) {
@@ -143,6 +153,21 @@ public class UserController {
 			errorResponse.setMessage(errorMessage); 
 			return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
 		}
+	}
+	
+	@PostMapping("/refresh")
+	public String refreshJwtToken(@RequestBody RequestTokenreq refreshToken){
+		RefreshToken refreshTokenobj = refreshTokenService.verifyRefreshToken(refreshToken.getRefreshtoken());
+		
+		User user = refreshTokenobj.getUser();
+		
+		String jwtToken = jwtService.generateToken(user);
+		
+		Token token =  Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(jwtService.getExp(jwtToken)).build();
+		tokenRepository.save(token);		
+		
+		return jwtToken;
+		
 	}
 	
 	@PostMapping("/logout")

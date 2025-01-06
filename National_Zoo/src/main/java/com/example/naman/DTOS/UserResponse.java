@@ -15,4 +15,5 @@ public class UserResponse {
     private String token;
     private String message;
     private ResponseUserDTO user;
+    private String refreshToken;
 }
