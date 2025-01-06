@@ -140,8 +140,8 @@ public class UserController {
 			authenticatedUser.setToken(jwtToken);
 			
 			// save JWT Token in Database
-			Token token =  Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(LocalDateTime.now().plusHours(2)).build();
-//			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(jwtService.getExp(jwtToken)).build();
+
+			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(jwtService.getExp(jwtToken)).build();
 			tokenRepository.save(token);		
 			return ResponseEntity.ok(authenticatedUser);
 		} catch (ResponseStatusException e) {

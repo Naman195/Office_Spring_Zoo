@@ -2,6 +2,7 @@ package com.example.naman.services;
 
 import java.security.Key;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,9 +86,15 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
     
+//    public LocalDateTime getExp(String token) {
+//    Claims xy = extractAllClaims( token);
+//    return  (LocalDateTime) xy.get("exp");
+//    }
+    
     public LocalDateTime getExp(String token) {
-    Claims xy = extractAllClaims( token);
-    return  (LocalDateTime) xy.get("exp");
+        Claims xy = extractAllClaims(token);
+        Long expTimestamp = xy.get("exp", Long.class); // Directly fetch as Long
+        return LocalDateTime.ofEpochSecond(expTimestamp, 0, ZoneOffset.UTC);
     }
     
     private Claims extractAllClaims(String token) {
