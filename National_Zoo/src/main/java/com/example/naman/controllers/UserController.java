@@ -1,6 +1,7 @@
 package com.example.naman.controllers;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -142,6 +143,7 @@ public class UserController {
 			// save JWT Token in Database
 
 			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(jwtService.getExp(jwtToken)).build();
+//			Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(LocalDateTime.now().plusHours(2)).build();
 			tokenRepository.save(token);		
 			return ResponseEntity.ok(authenticatedUser);
 		} catch (ResponseStatusException e) {
@@ -154,6 +156,8 @@ public class UserController {
 			return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
 		}
 	}
+	
+	
 	
 	@PostMapping("/refresh")
 	public String refreshJwtToken(@RequestBody RequestTokenreq refreshToken){

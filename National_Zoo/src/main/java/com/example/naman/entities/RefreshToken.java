@@ -1,6 +1,7 @@
 package com.example.naman.entities;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,8 +34,9 @@ public class RefreshToken {
 	private String refreshToken;
 	
 	@OneToOne
+	
 	private User user;
 	
-	private Instant expireAt;
+	private LocalDateTime expireAt;
 	
 }

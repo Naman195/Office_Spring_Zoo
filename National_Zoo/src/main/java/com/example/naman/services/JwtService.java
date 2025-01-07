@@ -1,7 +1,9 @@
 package com.example.naman.services;
 
 import java.security.Key;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +34,7 @@ public class JwtService {
     private String secretKey;
 
 //    @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration = 2*60*1000;
+    private long jwtExpiration = 10*60*1000;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -93,8 +95,8 @@ public class JwtService {
     
     public LocalDateTime getExp(String token) {
         Claims xy = extractAllClaims(token);
-        Long expTimestamp = xy.get("exp", Long.class); // Directly fetch as Long
-        return LocalDateTime.ofEpochSecond(expTimestamp, 0, ZoneOffset.UTC);
+        Long expTimeStamp = xy.getExpiration().getTime()/1000;
+        return LocalDateTime.ofInstant(Instant.ofEpochSecond(expTimeStamp), ZoneId.systemDefault());
     }
     
     private Claims extractAllClaims(String token) {

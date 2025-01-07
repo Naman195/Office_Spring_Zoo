@@ -89,7 +89,7 @@ public class User implements UserDetails {
 	
 	private String image;
 	
-	@OneToOne(mappedBy = "user")
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	@JsonIgnore
 	private RefreshToken refreshToken;
 	

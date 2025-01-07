@@ -1,6 +1,7 @@
 package com.example.naman.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -20,15 +21,17 @@ public class TokenService
 	/**
 	 * 
 	 */
-	@Scheduled(fixedRate = 6, timeUnit = TimeUnit.HOURS)
+	@Scheduled(fixedRate = 6, timeUnit = TimeUnit.MINUTES)
     void deleteExpiredTokens()
 	{
 		System.out.println("Scheduler is Running in every 1 Second");
         LocalDateTime now = LocalDateTime.now();
-        Optional<Token> tokenObj = tokenRepository.findByExpiresAtBefore(now);
-        if(tokenObj.isPresent()) {
-        	
-        	tokenRepository.delete(tokenObj.get());
+        List<Token> tokenObjectList = tokenRepository.findByExpiresAtBefore(now);
+        
+        for(Token obj: tokenObjectList) {
+        	tokenRepository.delete(obj);
         }
+        
+        
     }
 }
