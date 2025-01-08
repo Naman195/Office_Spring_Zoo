@@ -21,7 +21,7 @@ public class TokenService
 	/**
 	 * 
 	 */
-	@Scheduled(fixedRate = 6, timeUnit = TimeUnit.MINUTES)
+	@Scheduled(fixedRate = 6, timeUnit = TimeUnit.HOURS)
     void deleteExpiredTokens()
 	{
 		System.out.println("Scheduler is Running in every 1 Second");
