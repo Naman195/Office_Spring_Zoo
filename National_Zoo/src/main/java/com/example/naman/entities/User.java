@@ -42,12 +42,7 @@ import lombok.Setter;
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+	@Setter
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name  = "user_id")

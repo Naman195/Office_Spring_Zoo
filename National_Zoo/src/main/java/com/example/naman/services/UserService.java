@@ -109,6 +109,7 @@ public class UserService {
 		    }
 			
 			User user = modelMapper.map(userDTO, User.class); // convert user DTO  to User Class
+			user.setUserId(null);
 			Roles role = roleRepository.findById(userDTO.getRoleId()).get(); 
 			user.setRole(role);
 			String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
