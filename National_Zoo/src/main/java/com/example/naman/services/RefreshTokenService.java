@@ -15,7 +15,7 @@ import com.example.naman.repositories.UserRepository;
 @Service
 public class RefreshTokenService {
 
-	public long rereshTokenValidity = 24*60*60;
+	public long rereshTokenValidity = 10*60;
 	
 	@Autowired
 	private RefreshTokenRepository tokenRepository;

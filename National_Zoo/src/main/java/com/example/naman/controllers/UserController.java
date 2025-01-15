@@ -31,8 +31,8 @@ import com.example.naman.DTOS.ForgotPasswordRequestDTO;
 import com.example.naman.DTOS.OtpResponseDTO;
 import com.example.naman.DTOS.RequestTokenreq;
 import com.example.naman.DTOS.ResponseUserDTO;
-import com.example.naman.DTOS.SetPasswordRequest;
-import com.example.naman.DTOS.UpdatePassworsDTO;
+import com.example.naman.DTOS.UpdatePasswordDTO;
+import com.example.naman.DTOS.SetPasswordDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.RefreshToken;
@@ -305,10 +305,9 @@ public class UserController {
 	 * */
 	
 	@PostMapping("/setpassword")
-	public ResponseEntity<String> setPassword(@RequestHeader("Authorization") String tokenHeader,
-			@RequestBody SetPasswordRequest request) {
+	public ResponseEntity<String> setPassword(@RequestBody SetPasswordDTO request) {
 		try {
-			String response = userService.setPassword(tokenHeader, request.getNewPassword(), request.getOldPassword());
+			String response = userService.setPassword(request.getTokenKey(), request.getNewPassword());
 			return ResponseEntity.ok(response);
 		} catch (ResponseStatusException e) {
 			return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
@@ -316,8 +315,8 @@ public class UserController {
 	}
 	
 	@PostMapping("/updatepassword")
-	public String updatePass(@RequestBody UpdatePassworsDTO updatepass){
-		return userService.updatePassword(updatepass.getTokenKey(), updatepass.getNewPassword());
+	public String updatePass(@RequestHeader("Authorization") String tokenHeader ,@RequestBody UpdatePasswordDTO request){
+		return userService.updatePassword(tokenHeader, request.getNewPassword(), request.getOldPassword());
 	}
 
 }

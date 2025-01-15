@@ -42,7 +42,7 @@ import lombok.Setter;
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
-	@Setter
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name  = "user_id")
@@ -99,8 +99,6 @@ public class User implements UserDetails {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-//		System.out.println("Hello" +  role.getRole());
-//		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.getRoleName()));
 		return authority;
 	}
 

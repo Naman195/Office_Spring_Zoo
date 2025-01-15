@@ -72,6 +72,9 @@ public class UserService {
 	private ModelMapper modelMapper;
 	
 	@Autowired
+	private ModelMapper userModelMapper;
+	
+	@Autowired
 	private RoleRepository roleRepository;
 	
 	@Autowired
@@ -108,8 +111,9 @@ public class UserService {
 		        throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
 		    }
 			
-			User user = modelMapper.map(userDTO, User.class); // convert user DTO  to User Class
-			user.setUserId(null);
+//			User user = modelMapper.map(userDTO, User.class); // convert user DTO  to User Class
+			User user = userModelMapper.map(userDTO, User.class);
+//			user.setUserId(null);
 			Roles role = roleRepository.findById(userDTO.getRoleId()).get(); 
 			user.setRole(role);
 			String password = bcryptPasswordEncoder.encode(userDTO.getPassword());
@@ -118,7 +122,7 @@ public class UserService {
 	        	String imageName = saveImage(image);
 	        	user.setImage(imageName);
 	        }
-			userRepository.save(user);
+			userRepository.save(user);	
 		} catch (IOException e) {
 	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
 	    }catch (Exception e) {
@@ -335,7 +339,7 @@ public class UserService {
 	            String uniqueKey = UUID.randomUUID().toString(); 
 	            tokenStore.put(uniqueKey, forgotPasswordToken);
 			 
-		        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
+//		        String resetPasswordUrl = "http://localhost:3000/setpass?token=" + forgotPasswordToken;
 		        
 		        Map<String, String> response = new HashMap<>();
 		        response.put("message", MessageResponse.OTPVERIFY.getMessage());
@@ -359,7 +363,36 @@ public class UserService {
 		 * @author Naman Arora
 		 * */
 	 
-	 public String setPassword(String tokenHeader, String newPassword, String oldPassword) {
+	 
+	 
+	
+	 public String setPassword(String tokenKey, String newPassword) {
+		 if(newPassword == null || newPassword.length() < 6) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
+			}
+		 String tokenValue = tokenStore.get(tokenKey);
+			 	 
+		 if (tokenValue == null ) {
+	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session Expire.");
+	        }
+
+	        String username = jwtService.extractUsername(tokenValue);
+	        
+	        User user = userRepository.findByuserName(username)
+	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
+	        
+	        user.setPassword(bcryptPasswordEncoder.encode(newPassword));
+	        userRepository.save(user);
+
+	        tokenStore.clear();
+	        
+	        return MessageResponse.UPDATE_PASSWORD.getMessage();
+
+	        
+	 }
+	 
+	 
+	 public String updatePassword(String tokenHeader, String newPassword, String oldPassword) {
 	        
 			if(newPassword == null || newPassword.length() < 6) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
@@ -385,30 +418,6 @@ public class UserService {
 
 	        return MessageResponse.UPDATE_PASSWORD.getMessage();
 	    }
-	
-	 public String updatePassword(String tokenKey, String newPassword) {
-		 if(newPassword == null || newPassword.length() < 6) {
-				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, MessageResponse.PASSWORD_LEN.getMessage());
-			}
-		 String tokenValue = tokenStore.get(tokenKey);
-			 	 
-		 if (tokenValue == null ) {
-	            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Session Expire.");
-	        }
-
-	        String username = jwtService.extractUsername(tokenValue);
-	        
-	        User user = userRepository.findByuserName(username)
-	                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, MessageResponse.USERNOTFOUND.getMessage()));
-	        
-	        user.setPassword(bcryptPasswordEncoder.encode(newPassword));
-	        userRepository.save(user);
-
-	        tokenStore.clear();
-	        
-	        return MessageResponse.UPDATE_PASSWORD.getMessage();
-
-	        
-	 }
+	 
 	
 }
