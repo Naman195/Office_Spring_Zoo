@@ -105,6 +105,8 @@ public class UserController {
 		        ResponseEntity.badRequest().body(errorMessage);
 		        }
 		        
+		        
+		        
 			userService.createUser(user, file);
 			return ResponseEntity.status(HttpStatus.CREATED).body(MessageResponse.REGISTERED_USER.getMessage());
 		}catch (JsonProcessingException e) {

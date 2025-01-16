@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.entities.RefreshToken;
 import com.example.naman.entities.User;
@@ -15,7 +17,7 @@ import com.example.naman.repositories.UserRepository;
 @Service
 public class RefreshTokenService {
 
-	public long rereshTokenValidity = 10*60;
+	public long rereshTokenValidity = 6*60;
 	
 	@Autowired
 	private RefreshTokenRepository tokenRepository;
@@ -48,7 +50,8 @@ public class RefreshTokenService {
 		
 		if(refreshTokenObj.getExpireAt().compareTo(LocalDateTime.now())  < 0) {
 			tokenRepository.delete(refreshTokenObj);
-			throw new  RuntimeException("Refresh Token Expired!!");
+//			throw new  RuntimeException("Refresh Token Expired!!");
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token expired");
 		}
 		
 		return refreshTokenObj;

@@ -65,8 +65,7 @@ public class UserService {
 	@Autowired
 	private BCryptPasswordEncoder bcryptPasswordEncoder;
 
-	@Autowired
-    private  AuthenticationManager authenticationManager;
+	
 	
 	@Autowired
 	private ModelMapper modelMapper;
@@ -176,9 +175,9 @@ public class UserService {
 	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
 	    }
 
-	    authenticationManager.authenticate(
-	        new UsernamePasswordAuthenticationToken(username, password)
-	    );
+//	    authenticationManager.authenticate(
+//	        new UsernamePasswordAuthenticationToken(username, password)
+//	    );
 	    
 	    ResponseUserDTO userResponse = modelMapper.map(user, ResponseUserDTO.class);
 	    
