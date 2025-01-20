@@ -1,8 +1,6 @@
 package com.example.naman.controllers;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,14 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.naman.DTOS.CreateUserDTO;
-import com.example.naman.DTOS.CreateZooDTO;
 import com.example.naman.DTOS.CredentialsDTO;
 import com.example.naman.DTOS.ForgotPasswordRequestDTO;
 import com.example.naman.DTOS.OtpResponseDTO;
 import com.example.naman.DTOS.RequestTokenreq;
 import com.example.naman.DTOS.ResponseUserDTO;
-import com.example.naman.DTOS.UpdatePasswordDTO;
 import com.example.naman.DTOS.SetPasswordDTO;
+import com.example.naman.DTOS.UpdatePasswordDTO;
 import com.example.naman.DTOS.UpdateUserDTO;
 import com.example.naman.DTOS.UserResponse;
 import com.example.naman.entities.RefreshToken;
@@ -47,7 +46,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 
 
@@ -88,6 +86,9 @@ public class UserController {
 	 * 
 	  */
 	
+	
+	
+	
 	@PostMapping(value = "/create", consumes = { "multipart/form-data" })
 	public ResponseEntity<String> createUser(@RequestPart("user") String userJson, 
             @RequestPart(value = "file", required = false) MultipartFile file)
@@ -120,6 +121,13 @@ public class UserController {
 
 			return ResponseEntity.status(e.getStatusCode()).body(errorMessage);
 		}
+	}
+	
+	@GetMapping("/user-info")
+	public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal){
+		System.out.println(principal);
+		return principal.getAttributes();
+		
 	}
 
 	/**
@@ -157,6 +165,11 @@ public class UserController {
 			errorResponse.setMessage(errorMessage); 
 			return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
 		}
+	}
+	
+	@GetMapping("/hello")
+	public String hello() {
+		return "Hello";
 	}
 	
 	

@@ -9,5 +9,7 @@ import com.example.naman.entities.RefreshToken;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
 	public Optional<RefreshToken>  findByRefreshToken(String token);
+	
+//	public List<RefreshToken> findByExpireAtBefore(LocalDateTime now);
 
 }

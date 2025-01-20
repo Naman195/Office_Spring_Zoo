@@ -13,5 +13,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 	public Token findByTokenValue(String token);
 	
 	public List<Token> findByExpiresAtBefore(LocalDateTime now);
+	
+	
 
 }

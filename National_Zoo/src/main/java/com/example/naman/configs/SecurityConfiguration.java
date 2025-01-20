@@ -34,17 +34,18 @@ public class SecurityConfiguration {
         http
         .csrf(csrf -> csrf.disable())
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .httpBasic(httpBasic -> httpBasic.disable())
-        .formLogin((form) -> form.disable())
+//        .httpBasic(httpBasic -> httpBasic.disable())
+//        .formLogin((form) -> form.disable())
         .logout((logout) -> logout.disable())
         .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/auth/login", "/auth/create", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all")
+                        .requestMatchers("/auth/login", "/auth/create", "/login/oauth2/**", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all", "/auth/hello", "/auth/user-info")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
         				
 //        .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/dashboard", true))
         .sessionManagement(management -> management
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -58,6 +59,7 @@ return http.build();
         configuration.setAllowedOrigins(List.of("http://localhost:3000/"));
         configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH") );
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
