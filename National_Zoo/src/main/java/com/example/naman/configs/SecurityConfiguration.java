@@ -8,6 +8,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,24 +43,30 @@ public class SecurityConfiguration {
         .logout((logout) -> logout.disable())
         .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/auth/login", "/auth/create", "/login/oauth2/**", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all", "/auth/hello", "/auth/user-info")
+                        
                         .permitAll()
+                        .requestMatchers("/auth/user-info") // Allow access only for authenticated users
+                        .authenticated()	
                         .anyRequest()
                         .authenticated())
         				
 //        .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/dashboard", true))
+        		
         .sessionManagement(management -> management
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS.IF_REQUIRED));
 
 return http.build();
     }
 
+ 
+    	
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:3000/"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH") );
         configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
         configuration.setAllowCredentials(true);
