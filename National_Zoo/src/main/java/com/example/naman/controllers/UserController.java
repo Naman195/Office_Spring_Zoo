@@ -125,9 +125,6 @@ public class UserController {
 	
 	@GetMapping("/user-info")
 	public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal){
-		if (principal == null) {
-	        throw new RuntimeException("User  not authenticated");
-	    }
 		System.out.println(principal);
 		return principal.getAttributes();
 		

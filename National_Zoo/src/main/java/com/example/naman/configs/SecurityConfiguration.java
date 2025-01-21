@@ -2,16 +2,13 @@ package com.example.naman.configs;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -24,6 +21,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfiguration {
 //    private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    @Autowired
+    private CustomOAuth2LoginSuccessHandler auth2LoginSuccessHandler;
 
     public SecurityConfiguration(
         JwtAuthenticationFilter jwtAuthenticationFilter
@@ -45,14 +45,12 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/login", "/auth/create", "/login/oauth2/**", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all", "/auth/hello", "/auth/user-info")
                         
                         .permitAll()
-                        .requestMatchers("/auth/user-info") // Allow access only for authenticated users
-                        .authenticated()	
+                        
                         .anyRequest()
                         .authenticated())
         				
-//        .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("http://localhost:3000/dashboard", true))
+        .oauth2Login(oauth2 -> oauth2.successHandler(auth2LoginSuccessHandler))
         		
         .sessionManagement(management -> management
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS.IF_REQUIRED));
