@@ -1,11 +1,14 @@
 package com.example.naman.controllers;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +42,14 @@ import com.example.naman.entities.Token;
 import com.example.naman.entities.User;
 import com.example.naman.enums.MessageResponse;
 import com.example.naman.repositories.TokenRepository;
+import com.example.naman.repositories.UserRepository;
 import com.example.naman.services.JwtService;
 import com.example.naman.services.RefreshTokenService;
 import com.example.naman.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
@@ -76,6 +81,12 @@ public class UserController {
 	
 	@Autowired
 	private RefreshTokenService refreshTokenService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	/**
 	 * this controller is used for create new User.
@@ -124,11 +135,44 @@ public class UserController {
 	}
 	
 	@GetMapping("/user-info")
-	public Map<String, Object> user(@AuthenticationPrincipal OAuth2User principal){
-		System.out.println(principal);
-		return principal.getAttributes();
-		
+	public ResponseEntity<Void> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
+	    String email = principal.getAttribute("email");
+	    User user = userRepository.findByEmail(email)
+	                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	
+	    String jwtToken = jwtService.generateToken(user);
+	    RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+	
+	    
+	    String redirectUrl = String.format("http://zoo.in:3000/api/auth/callback?token=%s&refreshToken=%s&userId=%s&username=%s",
+	            jwtToken,
+	            refreshToken.getRefreshToken(),
+	            user.getUserId(),
+	            user.getUsername());
+	
+	    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirectUrl)).build();
 	}
+	
+//	 @GetMapping("/user-info")
+//  public ResponseEntity<UserResponse> getUserInfo(@AuthenticationPrincipal OAuth2User  principal, HttpSession rqst) {
+//      String email = principal.getAttribute("email");
+//      User user = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+//      ResponseUserDTO userRes = modelMapper.map(user, ResponseUserDTO.class);
+//     
+//      String jwtToken = jwtService.generateToken(user);
+//      RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+//      UserResponse userResponse = UserResponse.builder()
+//              .userId(user.getUserId())
+//              .username(user.getUsername())
+//              .token(jwtToken)
+//              .message("User loggedIn successfully")
+//              .user(userRes)
+//              .refreshToken(refreshToken.getRefreshToken())
+//              .build();
+//      return ResponseEntity.status(200)
+//    		  .location(URI.create("http://zoo.in:3000/dashboard"))
+//    		  .body(userResponse);
+//  }
 
 	/**
 	 * this  controller is used for User LoggedIn
@@ -335,3 +379,4 @@ public class UserController {
 	}
 
 }
+

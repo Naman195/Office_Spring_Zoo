@@ -82,6 +82,8 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
 		        
 		        response.getWriter().write(mapper.writeValueAsString(userResponse));
 		        response.setStatus(HttpServletResponse.SC_OK);
+		        
+		        response.sendRedirect("http://localhost:3000/dashboard");
 
 			
 		} catch (Exception e) {
