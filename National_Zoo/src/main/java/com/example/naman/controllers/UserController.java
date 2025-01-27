@@ -141,8 +141,11 @@ public class UserController {
 	                              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	
 	    String jwtToken = jwtService.generateToken(user);
+	    
 	    RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
-	
+	    
+	    Token token = Token.builder().tokenValue(jwtToken).userId(user.getUserId()).expiresAt(jwtService.getExp(jwtToken)).build();
+	    tokenRepository.save(token);
 	    
 	    String redirectUrl = String.format("http://zoo.in:3000/api/auth/callback?token=%s&refreshToken=%s&userId=%s&username=%s",
 	            jwtToken,
@@ -260,12 +263,13 @@ public class UserController {
 	 * 
 	 * @author Naman Arora.
 	 *  */
-
+	
+	@PreAuthorize("hasAuthority('create')")
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getUserById(@PathVariable Long userId)
+	public ResponseEntity<?> getUserById(@PathVariable Long id)
 	{
 		try {
-			ResponseUserDTO user = userService.getUserById(userId);
+			ResponseUserDTO user = userService.getUserById(id);
 			return ResponseEntity.ok(user);
 		} catch (ResponseStatusException e) {
 			return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
