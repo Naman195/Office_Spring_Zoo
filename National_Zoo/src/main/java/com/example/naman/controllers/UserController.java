@@ -156,26 +156,6 @@ public class UserController {
 	    return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(redirectUrl)).build();
 	}
 	
-//	 @GetMapping("/user-info")
-//  public ResponseEntity<UserResponse> getUserInfo(@AuthenticationPrincipal OAuth2User  principal, HttpSession rqst) {
-//      String email = principal.getAttribute("email");
-//      User user = userRepository.findByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-//      ResponseUserDTO userRes = modelMapper.map(user, ResponseUserDTO.class);
-//     
-//      String jwtToken = jwtService.generateToken(user);
-//      RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
-//      UserResponse userResponse = UserResponse.builder()
-//              .userId(user.getUserId())
-//              .username(user.getUsername())
-//              .token(jwtToken)
-//              .message("User loggedIn successfully")
-//              .user(userRes)
-//              .refreshToken(refreshToken.getRefreshToken())
-//              .build();
-//      return ResponseEntity.status(200)
-//    		  .location(URI.create("http://zoo.in:3000/dashboard"))
-//    		  .body(userResponse);
-//  }
 
 	/**
 	 * this  controller is used for User LoggedIn
@@ -214,11 +194,7 @@ public class UserController {
 		}
 	}
 	
-	@GetMapping("/hello")
-	public String hello() {
-		return "Hello";
-	}
-	
+
 	
 	
 	@PostMapping("/refresh")

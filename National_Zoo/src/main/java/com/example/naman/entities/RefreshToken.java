@@ -34,7 +34,6 @@ public class RefreshToken {
 	private String refreshToken;
 	
 	@OneToOne
-	
 	private User user;
 	
 	private LocalDateTime expireAt;

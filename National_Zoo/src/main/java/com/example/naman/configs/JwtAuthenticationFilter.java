@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,28 +21,29 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import com.example.naman.entities.Token;
 import com.example.naman.repositories.TokenRepository;
 import com.example.naman.services.JwtService;
+import com.example.naman.services.TokenCache;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-    private final TokenRepository tokenRepository;
+   
+    private final TokenCache tokenCache;
 
     public JwtAuthenticationFilter(
         JwtService jwtService,
-        UserDetailsService userDetailsService,
         HandlerExceptionResolver handlerExceptionResolver,
-        TokenRepository tokenRepository
+        TokenCache tokenCache
     ) {
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
-        this.tokenRepository = tokenRepository;
+        this.tokenCache = tokenCache;
     }
 
     @Override
@@ -63,15 +66,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (userEmail != null && authentication == null) {
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                	 Token token = tokenRepository.findByTokenValue(jwt);
+                if (jwtService.isTokenValid(jwt)) {
+                	 @SuppressWarnings("unchecked")
+                	 List<String> authori = (List<String>)jwtService.extractAllClaims(jwt).get("authorities");
+                	 
+                	 List<GrantedAuthority> authorities = authori.stream().map(role -> new SimpleGrantedAuthority(role)).collect(Collectors.toList());
+                	 
+                	 Token token = tokenCache.findTokenByToken(jwt);
                 	 if(token != null && token.getExpiresAt().isAfter(LocalDateTime.now())) {
                 		 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                                 userDetails,
+                                 userEmail,
                                  null,
-                                 userDetails.getAuthorities()
+                                 authorities
                          );
                 		 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                          SecurityContextHolder.getContext().setAuthentication(authToken);

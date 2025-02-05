@@ -2,7 +2,6 @@ package com.example.naman.configs;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,11 +18,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration {
-//    private final AuthenticationProvider authenticationProvider;
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     
-    @Autowired
-    private CustomOAuth2LoginSuccessHandler auth2LoginSuccessHandler;
 
     public SecurityConfiguration(
         JwtAuthenticationFilter jwtAuthenticationFilter
@@ -38,8 +35,8 @@ public class SecurityConfiguration {
         http
         .csrf(csrf -> csrf.disable())
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//        .httpBasic(httpBasic -> httpBasic.disable())
-//        .formLogin((form) -> form.disable())
+        .httpBasic(httpBasic -> httpBasic.disable())
+        .formLogin((form) -> form.disable())
         .logout((logout) -> logout.disable())
         .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/auth/login", "/auth/create", "/login/oauth2/**", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all", "/auth/hello", "/auth/user-info")

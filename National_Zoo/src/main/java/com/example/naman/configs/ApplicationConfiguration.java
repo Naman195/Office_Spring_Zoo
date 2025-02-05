@@ -1,12 +1,8 @@
 package com.example.naman.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import com.example.naman.repositories.UserRepository;
-import com.example.naman.services.UserDetailServiceImpl;
 
 /**
  * Documentation
@@ -19,36 +15,10 @@ import com.example.naman.services.UserDetailServiceImpl;
 @Configuration
 public class ApplicationConfiguration {
 	
-    private final UserRepository userRepository;
-    
-    @Autowired
-    private UserDetailServiceImpl userDetailServiceImpl;
-
-    public ApplicationConfiguration(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-//    @Bean
-//    UserDetailsService userDetailsService() {
-//        return username -> userRepository.findByuserName(username)
-//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-//    }
-
+ 
     @Bean
     BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-//        return config.getAuthenticationManager();
-//    }
-
-//    @Bean
-//    AuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-//        authProvider.setUserDetailsService(userDetailServiceImpl);
-//        authProvider.setPasswordEncoder(passwordEncoder());
-//        return authProvider;
-//    }
 }

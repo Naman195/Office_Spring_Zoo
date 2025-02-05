@@ -35,6 +35,7 @@ import com.example.naman.enums.MessageResponse;
 import com.example.naman.exceptions.ResourceNotFoundException;
 import com.example.naman.repositories.AnimalRepository;
 import com.example.naman.repositories.TransferHistoryRepository;
+import com.example.naman.repositories.UserRepository;
 import com.example.naman.repositories.ZooRepository;
 
 /**
@@ -55,6 +56,9 @@ public class AnimalService {
 	
 	@Autowired
 	private ZooRepository zooRepository;
+	
+	 @Autowired
+	       private UserRepository userRepository;
 	
 	@Autowired
 	private TransferHistoryRepository transferHistoryRepository;
@@ -272,7 +276,10 @@ private String saveImage(MultipartFile image) throws IOException {
 		 
 		 // get Current loggedIn User from Security Context
 		 
-		 User currentUser  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		 User currentUser  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 
+		 String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		 User currentUser = userRepository.findByuserName(username).get();
 		 
 		 transferHistory.setUserName(currentUser.getUsername());
 		 
