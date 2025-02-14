@@ -12,6 +12,13 @@ import com.example.naman.DTOS.ZooResponseDTO;
 import com.example.naman.entities.Animal;
 import com.example.naman.entities.Zoo;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
 public interface ZooRepository extends JpaRepository<Zoo, Long> {
 	
 	Page<Zoo> findByArchievedFalse(Pageable pageable);

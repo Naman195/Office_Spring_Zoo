@@ -1,8 +1,5 @@
 package com.example.naman.DTOS;
 
-import com.example.naman.entities.State;
-
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

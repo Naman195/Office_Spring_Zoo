@@ -50,22 +50,22 @@ public class AnimalService {
 
 	@Autowired
 	private AnimalRepository animalRepository;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
-	
+
 	@Autowired
 	private ZooRepository zooRepository;
-	
-	 @Autowired
-	       private UserRepository userRepository;
-	
+
+	@Autowired
+	private UserRepository userRepository;
+
 	@Autowired
 	private TransferHistoryRepository transferHistoryRepository;
-	
+
 	@Value("${file.upload-dir}")
-    private String uploadDir;
-	
+	private String uploadDir;
+
 	/**
 	 * this method is used for Add New Animal in a Zoo.
 	 * @param animalJSON, animalImage.
@@ -73,28 +73,28 @@ public class AnimalService {
 	 * 
 	 * @author Naman Arora
 	 * */
-	
+
 	public void addAnimal(CreateAnimalDTO animal, MultipartFile image)
 	{
 		try {
 			Animal addAnimal = modelMapper.map(animal, Animal.class);
 			if(image != null && !image.isEmpty()) {
-	        	String imageName = saveImage(image);
-	        	addAnimal.setImage(imageName);
-	        }
-			
-		 animalRepository.save(addAnimal);
-			
-		} catch (IOException e) {
-	        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
-	    }  catch (Exception e) {
-	    	throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to add Animal: " + e.getMessage());
+				String imageName = saveImage(image);
+				addAnimal.setImage(imageName);
+			}
 
-	    }
-		
+			animalRepository.save(addAnimal);
+
+		} catch (IOException e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload image: " + e.getMessage());
+		}  catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to add Animal: " + e.getMessage());
+
+		}
+
 	}
-	
-	
+
+
 	/**
 	 * this method is used for save Image in the Upload Directory.
 	 * @param image
@@ -102,26 +102,26 @@ public class AnimalService {
 	 * 
 	 * @author Naman Arora
 	 * */
-	
-private String saveImage(MultipartFile image) throws IOException {
-		
+
+	private String saveImage(MultipartFile image) throws IOException {
+
 		if (image.isEmpty()) {
 			throw new IllegalArgumentException(MessageResponse.IMAGE_NULL.getMessage());
 		}
-		
-		
+
+
 		Path uploadPath = Paths.get(uploadDir);
 		if (!Files.exists(uploadPath)) {
 			Files.createDirectories(uploadPath);
 		}
-		
+
 		String fileName = System.currentTimeMillis() + "_" + image.getOriginalFilename();
 		Path filePath = uploadPath.resolve(fileName);
 		Files.write(filePath, image.getBytes());
 
 		return fileName.toString();	
 	}
-	
+
 	/**
 	 * this method is used for fetch All Animals via ZooId
 	 * @param pageable
@@ -134,23 +134,23 @@ private String saveImage(MultipartFile image) throws IOException {
 	{
 		return animalRepository.findByArchievedFalse(pageable);	
 	}
-	
+
 	public Page<AnimalResponseDTO> getAnimalByZooId(Long id, Pageable pageable)
 	{
-		
-		Page<Animal> allanimalsInZoo =  animalRepository.findByArchievedFalseAndZooZooId(id, pageable);
-		
-		
-		
-	    List<AnimalResponseDTO> animalResponseDTOs = allanimalsInZoo.getContent().stream()
-	            .map(animal -> modelMapper.map(animal, AnimalResponseDTO.class))
-	            .collect(Collectors.toList());
 
-	   
-	    return new PageImpl<>(animalResponseDTOs, pageable, allanimalsInZoo.getTotalElements());
-		
+		Page<Animal> allanimalsInZoo =  animalRepository.findByArchievedFalseAndZooZooId(id, pageable);
+
+
+
+		List<AnimalResponseDTO> animalResponseDTOs = allanimalsInZoo.getContent().stream()
+				.map(animal -> modelMapper.map(animal, AnimalResponseDTO.class))
+				.collect(Collectors.toList());
+
+
+		return new PageImpl<>(animalResponseDTOs, pageable, allanimalsInZoo.getTotalElements());
+
 	}
-	
+
 	/**
 	 * this method is used for get Animal By AnimalId
 	 * @param animalId
@@ -158,14 +158,14 @@ private String saveImage(MultipartFile image) throws IOException {
 	 * 
 	 * @author Naman Arora
 	 * */
-	
+
 	public AnimalResponseDTO getAnimalById(Long id)
 	{
 		Animal animal =  animalRepository.findById(id).filter(ani -> !ani.isArchieved())
 				.orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
 		return modelMapper.map(animal, AnimalResponseDTO.class);
 	}
-	
+
 	/**
 	 * this method is used for Archieved the Animal.
 	 * @param animalId
@@ -173,15 +173,15 @@ private String saveImage(MultipartFile image) throws IOException {
 	 * 
 	 * @author Naman Arora
 	 * */
-	
+
 	public void deletedAnimal(Long id)
 	{
-		
+
 		Animal ani = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
 		ani.setArchieved(true); 
 		animalRepository.save(ani);
 	}
-	
+
 	/**
 	 * this method is used for Update New Animal in a Zoo.
 	 * @param updateAnimalDTO, animalImage, id.
@@ -189,7 +189,7 @@ private String saveImage(MultipartFile image) throws IOException {
 	 * 
 	 * @author Naman Arora
 	 * */
-	
+
 	public AnimalResponseDTO updateAnimalById(CreateAnimalDTO updateAnimalDTO, MultipartFile image,  Long id) throws IOException
 	{
 		Animal existingAnimal = animalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
@@ -206,9 +206,9 @@ private String saveImage(MultipartFile image) throws IOException {
 		}
 		Animal updatedAnimal = animalRepository.save(existingAnimal);
 		return modelMapper.map(updatedAnimal, AnimalResponseDTO.class);
-	
+
 	}
-	
+
 	/**
 	 * this method is used for Search  Animal in a Zoo.
 	 * @param searchTerm, zooId.
@@ -216,119 +216,115 @@ private String saveImage(MultipartFile image) throws IOException {
 	 * 
 	 * @author Naman Arora
 	 * */
-	
-	 public List<Animal> searchByNameOrType(String searchTerm, Long zooId) {
-	        List<Animal> allAni =  animalRepository.findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
-	                searchTerm, searchTerm, zooId);
-	        List<Animal> allAnimalInZooByZooid = animalRepository.findByArchievedFalseAndZooZooId(zooId); 
-	        List<Animal> fnlList = new ArrayList<>();
-	        for(Animal ani: allAnimalInZooByZooid) {
-	        	if(allAni.contains(ani)) {
-	        		fnlList.add(ani);
-	        	}
-	        }
-	        return fnlList;
-	        
-	    }
-	 
-	 /**
-		 * this controller is used for fetchAllZooExceptCurrent.
-		 * @param zooid
-		 * @return ZooList
-		 * 
-		 * @author Naman Arora
-		 * */
-	 
-	 public List<ZooResponseDTO> getAllZooExceptCurrentZoo(Long id){
-		List<ZooResponseDTO> allZoo = zooRepository.findAllByZooIdNotAndArchievedFalse(id)
-												.stream()
-												.map(zoo -> modelMapper.map(zoo, ZooResponseDTO.class)).collect(Collectors.toList());
-		
-			return allZoo;
-		 
-		 
-	 }
-	 
-	 /**
-		 * this controller is used for transfer Animal from currentZoo to new Zoo.
-		 * @param animalId, newZooId.
-		 * @return AnimalResponseDTO
-		 * 
-		 * @author Naman Arora
-		 * */
-	 
-	 public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
-		 
-		 Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
-		 
-		 Zoo newZoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage()));
-		 
-		 Zoo currentZoo = animal.getZoo(); // get CurrentZoo where Animal Belongs.
-		 
-		 animal.setZoo(newZoo);
-		 animalRepository.save(animal);
-		 
-		 TransferHistory transferHistory = new TransferHistory();
-		 
-		 transferHistory.setAnimalId(animal);
-		 transferHistory.setFromZoo(currentZoo);
-		 transferHistory.setToZoo(newZoo);
-		 
-		 // get Current loggedIn User from Security Context
-		 
-//		 User currentUser  = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		 
-		 String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		 User currentUser = userRepository.findByuserName(username).get();
-		 
-		 transferHistory.setUserName(currentUser.getUsername());
-		 
-		 transferHistory.setDate(new Date(System.currentTimeMillis()));
-		 
-		 transferHistoryRepository.save(transferHistory);
-		 
-		 
-		 return modelMapper.map(animal, AnimalResponseDTO.class);
-		 
-			 
-	 }
-	 
-	 /**
-		 * this method is used for get Animal Transfer History.
-		 * @param animalId.
-		 * @return AnimalTransferHistory.
-		 * 
-		 * @author Naman Arora
-		 * */
-	 
-	 
-	 public ResponseEntity<?> animalTransferHistory(Long animalId) {
-		    List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
 
-		    if (historyList.isEmpty()) {
-		        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MessageResponse.TRANSFERHISTORYNOTFOUND.getMessage());
-		    }
-		    
-		    AnimalResponseDTO animal = new AnimalResponseDTO();
-		    Animal transferredAnimalData = historyList.get(0).getAnimalId();
-		    animal.setAnimalName(transferredAnimalData.getAnimalName());
-		    animal.setAnimalId(transferredAnimalData.getAnimalId());	
-		    animal.setAnimalType(transferredAnimalData.getAnimalType());
-		    animal.setZoo(modelMapper.map(transferredAnimalData.getZoo(), ZooResponseDTO.class));
-		    AnimalData_TransferHistoryDataDTO  ResponseDTO = new AnimalData_TransferHistoryDataDTO();
-		    ResponseDTO.setAnimalData(animal);
-		    // Map entities to DTOs
-		    List<TransferHistoryResponseDTO> response = historyList.stream()
-		        .map(history -> new TransferHistoryResponseDTO(
-		            history.getId(),
-		            history.getAnimalId().getAnimalName(),
-		            history.getFromZoo().getZooName(),
-		            history.getToZoo().getZooName(),
-		            history.getUserName(),
-		            history.getDate().toString()
-		        ))
-		        .toList();
-		    ResponseDTO.setTransferData(response);
-		    return ResponseEntity.ok(ResponseDTO);
+	public List<Animal> searchByNameOrType(String searchTerm, Long zooId) {
+		List<Animal> allAni =  animalRepository.findByAnimalNameContainingIgnoreCaseOrAnimalTypeContainingIgnoreCaseAndZoo_ZooId(
+				searchTerm, searchTerm, zooId);
+		List<Animal> allAnimalInZooByZooid = animalRepository.findByArchievedFalseAndZooZooId(zooId); 
+		List<Animal> fnlList = new ArrayList<>();
+		for(Animal ani: allAnimalInZooByZooid) {
+			if(allAni.contains(ani)) {
+				fnlList.add(ani);
+			}
 		}
+		return fnlList;
+
+	}
+
+	/**
+	 * this controller is used for fetchAllZooExceptCurrent.
+	 * @param zooid
+	 * @return ZooList
+	 * 
+	 * @author Naman Arora
+	 * */
+
+	public List<ZooResponseDTO> getAllZooExceptCurrentZoo(Long id){
+		List<ZooResponseDTO> allZoo = zooRepository.findAllByZooIdNotAndArchievedFalse(id)
+				.stream()
+				.map(zoo -> modelMapper.map(zoo, ZooResponseDTO.class)).collect(Collectors.toList());
+
+		return allZoo;
+
+
+	}
+
+	/**
+	 * this controller is used for transfer Animal from currentZoo to new Zoo.
+	 * @param animalId, newZooId.
+	 * @return AnimalResponseDTO
+	 * 
+	 * @author Naman Arora
+	 * */
+
+	public AnimalResponseDTO transferAnimal(Long animalId, Long newZooId) {
+
+		Animal animal = animalRepository.findById(animalId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ANIMALNOTFOUND.getMessage()));
+
+		Zoo newZoo = zooRepository.findById(newZooId).orElseThrow(() -> new ResourceNotFoundException(MessageResponse.ZOONOTFOUND.getMessage()));
+
+		Zoo currentZoo = animal.getZoo(); // get CurrentZoo where Animal Belongs.
+
+		animal.setZoo(newZoo);
+		animalRepository.save(animal);
+
+		TransferHistory transferHistory = new TransferHistory();
+
+		transferHistory.setAnimalId(animal);
+		transferHistory.setFromZoo(currentZoo);
+		transferHistory.setToZoo(newZoo);
+
+		String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User currentUser = userRepository.findByuserName(username).get();
+
+		transferHistory.setUserName(currentUser.getUsername());
+
+		transferHistory.setDate(new Date(System.currentTimeMillis()));
+
+		transferHistoryRepository.save(transferHistory);
+
+
+		return modelMapper.map(animal, AnimalResponseDTO.class);
+
+
+	}
+
+	/**
+	 * this method is used for get Animal Transfer History.
+	 * @param animalId.
+	 * @return AnimalTransferHistory.
+	 * 
+	 * @author Naman Arora
+	 * */
+
+
+	public ResponseEntity<?> animalTransferHistory(Long animalId) {
+		List<TransferHistory> historyList = transferHistoryRepository.findByAnimalId_AnimalId(animalId);
+
+		if (historyList.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MessageResponse.TRANSFERHISTORYNOTFOUND.getMessage());
+		}
+
+		AnimalResponseDTO animal = new AnimalResponseDTO();
+		Animal transferredAnimalData = historyList.get(0).getAnimalId();
+		animal.setAnimalName(transferredAnimalData.getAnimalName());
+		animal.setAnimalId(transferredAnimalData.getAnimalId());	
+		animal.setAnimalType(transferredAnimalData.getAnimalType());
+		animal.setZoo(modelMapper.map(transferredAnimalData.getZoo(), ZooResponseDTO.class));
+		AnimalData_TransferHistoryDataDTO  ResponseDTO = new AnimalData_TransferHistoryDataDTO();
+		ResponseDTO.setAnimalData(animal);
+		// Map entities to DTOs
+		List<TransferHistoryResponseDTO> response = historyList.stream()
+				.map(history -> new TransferHistoryResponseDTO(
+						history.getId(),
+						history.getAnimalId().getAnimalName(),
+						history.getFromZoo().getZooName(),
+						history.getToZoo().getZooName(),
+						history.getUserName(),
+						history.getDate().toString()
+						))
+				.toList();
+		ResponseDTO.setTransferData(response);
+		return ResponseEntity.ok(ResponseDTO);
+	}
 }

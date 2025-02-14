@@ -7,6 +7,14 @@ import com.example.naman.repositories.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
+
+/**
+ * Unique Email Annotation
+ *  @author Naman Arora
+ *  @since: 14 feb 2025
+ *  
+ * */
+
 public class UniqueEmailImpl implements ConstraintValidator<UniqueEmail, String> {
 	@Autowired
 	private UserRepository repository;

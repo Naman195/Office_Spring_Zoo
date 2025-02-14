@@ -3,12 +3,9 @@ package com.example.naman.entities;
 import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,18 +17,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
 
 @Getter
 @Setter
-
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-
 @Entity
 public class Address {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name  = "address_id")

@@ -1,5 +1,14 @@
 package com.example.naman.enums;
 
+/**
+ * 
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 public enum MessageResponse {
 	
 	LOGGEDIN_USER("User Loggedin Successfully"),
@@ -26,9 +35,7 @@ public enum MessageResponse {
 	JSON_INVALID("Invalid JSON format"),
 	ADD_ANIMAL("Animal added successfully"),
 	DELETE_ANIMAL("Animal Deleted SuccessFully");
-	
-	
-	
+		
 	
 	private String message;
 	

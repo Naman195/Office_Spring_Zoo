@@ -1,19 +1,15 @@
 package com.example.naman.entities;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.naman.annotations.UniqueEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -34,9 +30,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Getter
 @Setter
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -25,63 +25,64 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Getter
 @Setter
-
 @NoArgsConstructor
 @AllArgsConstructor
-
-
-
 @Entity
 @Table(name = "animal")
 @EntityListeners(AuditingEntityListener.class)
 public class Animal {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name  = "animal_id")
 	private Long animalId;
-	
+
 	@Column(name = "animal_name", nullable = false)
 	private String animalName;
-	
-	
+
 	@Column(name = "animal_type", nullable = false)
 	private String animalType;
-	
-	
+
 	private boolean archieved;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "zoo_id", nullable = false)
 	private Zoo zoo;
-	
+
 	private String image;
-	
-	
+
 	@CreatedBy
 	@Column(name = "created_by", nullable = false)
 	private String createdBy;
-	
+
 	@LastModifiedBy
 	@Column(name = "updated_by", nullable = true)
 	private String updatedBy;
-	
-	 @CreatedDate
-	 @CreationTimestamp
-	 @Column(name = "created_at", updatable = false)
-	 private Instant createdAt;
 
-	 @UpdateTimestamp
-	 @LastModifiedDate
-	 @Column(name = "updated_at", updatable = true)
-	 private String updatedAt;
-	 
-	 @PrePersist
-		public void func() {
-		 updatedBy = null;
-		}
-	
+	@CreatedDate
+	@CreationTimestamp
+	@Column(name = "created_at", updatable = false)
+	private Instant createdAt;
+
+	@UpdateTimestamp
+	@LastModifiedDate
+	@Column(name = "updated_at", updatable = true)
+	private String updatedAt;
+
+	@PrePersist
+	public void func() {
+		updatedBy = null;
+	}
+
 
 }

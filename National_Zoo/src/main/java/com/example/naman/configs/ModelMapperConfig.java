@@ -7,9 +7,22 @@ import org.springframework.context.annotation.Configuration;
 import com.example.naman.DTOS.CreateUserDTO;
 import com.example.naman.entities.User;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Configuration
 public class ModelMapperConfig {
 
+	/**
+	 * Make Bean of ModelMapper
+	 * @return Bean of ModelMapper default bean
+	 */
+	
 	@Bean
 	ModelMapper modelMapper() {
 		ModelMapper modelMapper = new ModelMapper();
@@ -19,6 +32,11 @@ public class ModelMapperConfig {
         return modelMapper;
 
 	}
+	
+	/**
+	 * Make Specific modelMapper Bean for User Entity
+	 * @return   modelMapper
+	 */
 	
 	@Bean
 	ModelMapper userModelMapper() {

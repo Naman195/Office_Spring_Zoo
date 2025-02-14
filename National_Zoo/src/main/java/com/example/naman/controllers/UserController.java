@@ -2,7 +2,6 @@ package com.example.naman.controllers;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +48,6 @@ import com.example.naman.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 
@@ -134,6 +132,11 @@ public class UserController {
 		}
 	}
 	
+	/**
+	 * this controller is used for login Uer with Google and Github
+	 * @param principal
+	 * @return RedirectUrl On frontend ServerSide
+	 */
 	@GetMapping("/user-info")
 	public ResponseEntity<Void> getUserInfo(@AuthenticationPrincipal OAuth2User principal) {
 	    String email = principal.getAttribute("email");
@@ -195,6 +198,15 @@ public class UserController {
 	}
 	
 
+	/**
+	 * this Controller is used generate JWT Token After verify the refresh Token validity
+	 * 
+	 * @param refreshToken
+	 * @return JWT Token
+	 * 
+	 * @author naman
+	 * 
+	 */
 	
 	
 	@PostMapping("/refresh")
@@ -211,6 +223,14 @@ public class UserController {
 		return jwtToken;
 		
 	}
+	
+	/**
+	 * this controller is used for loggedOut the Current User.
+	 * @param tokenHeader
+	 * @return LogoutUser
+	 * 
+	 * @author naman
+	 */
 	
 	@PostMapping("/logout")
 	public String logout(@RequestHeader("Authorization") String tokenHeader) {

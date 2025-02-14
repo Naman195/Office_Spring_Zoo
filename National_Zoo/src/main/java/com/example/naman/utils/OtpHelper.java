@@ -7,12 +7,21 @@ import java.util.Random;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Component
 public class OtpHelper {
 	private static final long OTP_LEN = 5;
 	private static final long EXPIRATION_TIME_IN_MILLISEC = 5*60*1000;
 	
 	private final Map<String, OtpEntry> otpStore = new HashMap<>();
+	
 	
 	private static class OtpEntry {
 		String otp;

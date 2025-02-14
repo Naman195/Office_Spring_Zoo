@@ -25,12 +25,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Setter
 @Getter
-
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Entity
 @Table(name = "zoo")
 @EntityListeners(AuditingEntityListener.class)

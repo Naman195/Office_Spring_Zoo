@@ -13,8 +13,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateUserDTO {
-	
+public class UpdateUserDTO
+{
 	@NotNull(message =  "Name is not null")
 	private String fullName;
 //	@NotNull(message =  "Email is not null")

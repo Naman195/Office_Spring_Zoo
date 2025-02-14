@@ -1,6 +1,5 @@
 package com.example.naman.services;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,6 +13,14 @@ import com.example.naman.entities.User;
 import com.example.naman.repositories.RefreshTokenRepository;
 import com.example.naman.repositories.UserRepository;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Service
 public class RefreshTokenService {
 
@@ -24,6 +31,12 @@ public class RefreshTokenService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	/**
+	 * this method is used for create the RefreshToken on Used LoggedIn  
+	 * @param userName
+	 * @return  refreshToken
+	 */
 	
 	public RefreshToken createRefreshToken(String userName) {
 		User user = userRepository.findByuserName(userName).get();
@@ -44,6 +57,13 @@ public class RefreshTokenService {
 		
 		
 	}
+	
+	
+	/**
+	 * This Method is used for Verify the Refresh Token Validity
+	 * @param refreshToken
+	 * @return refreshTokenObj
+	 */
 	
 	public RefreshToken verifyRefreshToken(String refreshToken) {
 		RefreshToken refreshTokenObj = tokenRepository.findByRefreshToken(refreshToken).orElseThrow(()-> new RuntimeException("refresh Token is invalid"));

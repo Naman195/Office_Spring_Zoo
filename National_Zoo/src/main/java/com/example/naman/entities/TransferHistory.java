@@ -22,11 +22,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-
 @Entity
 @Table(name = "transfer_history")
 @EntityListeners(AuditingEntityListener.class)
@@ -50,8 +57,7 @@ public class TransferHistory {
 	@JoinColumn(name="animal_id")
 	private Animal animalId;
 	
-//	@ManyToOne
-//	@JoinColumn(name="username")
+
 	@Column(name = "username", unique = true)
 	private String userName;
 	

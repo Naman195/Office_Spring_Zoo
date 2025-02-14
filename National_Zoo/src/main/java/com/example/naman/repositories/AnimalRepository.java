@@ -8,6 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.naman.entities.Animal;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 public interface AnimalRepository extends JpaRepository<Animal, Long> {
 	
 	Page<Animal> findByArchievedFalseAndZooZooId(Long id, Pageable pageable);

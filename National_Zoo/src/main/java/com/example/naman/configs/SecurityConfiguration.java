@@ -14,62 +14,85 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfiguration(
-        JwtAuthenticationFilter jwtAuthenticationFilter
-        
-    ) {
-        
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .httpBasic(httpBasic -> httpBasic.disable())
-        .formLogin((form) -> form.disable())
-        .logout((logout) -> logout.disable())
-        .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/auth/login", "/auth/create", "/login/oauth2/**", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all", "/auth/hello", "/auth/user-info")
-                        
-                        .permitAll()
-                        
-                        .anyRequest()
-                        .authenticated())
-        				
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-        .oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/auth/user-info"))
-        		
-        .sessionManagement(management -> management
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS.IF_REQUIRED));
+	public SecurityConfiguration(
+			JwtAuthenticationFilter jwtAuthenticationFilter
 
-return http.build();
-    }
+			) {
 
- 
-    	
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+	}
+	
+	/**
+	 * SecurityFilterChain Method for Enable SpringSecurity
+	 * 
+	 * @param http
+	 * @return http
+	 * @throws Exception
+	 */
 
-        configuration.setAllowedOrigins(List.of("http://zoo.in:3000"));
-        configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH") );
-        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
-        configuration.setAllowCredentials(true);
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+		.csrf(csrf -> csrf.disable())
+		.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+		.httpBasic(httpBasic -> httpBasic.disable())
+		.formLogin((form) -> form.disable())
+		.logout((logout) -> logout.disable())
+		.authorizeHttpRequests((requests) -> requests
+				.requestMatchers("/auth/login", "/auth/create", "/login/oauth2/**", "/country/all", "/state/*", "/city/*", "/auth/forgotpassword", "/auth/verifyotp", "/auth/setpassword", "/auth/refresh", "/role/all", "/auth/hello", "/auth/user-info")
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+				.permitAll()
 
-        source.registerCorsConfiguration("/**",configuration);
+				.anyRequest()
+				.authenticated())
 
-        return source;
-    }
+		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+		.oauth2Login(oauth2 -> oauth2.defaultSuccessUrl("/auth/user-info"))
+
+		.sessionManagement(management -> management
+				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+
+		return http.build();
+	}
+
+	
+	/**
+	 * Cors Configuration bean
+	 * @return cors Configuration
+	 * 
+	 */
+
+
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		configuration.setAllowedOrigins(List.of("http://zoo.in:3000"));
+		configuration.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS", "PATCH") );
+		configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+		configuration.setAllowCredentials(true);
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+		source.registerCorsConfiguration("/**",configuration);
+
+		return source;
+	}
 }

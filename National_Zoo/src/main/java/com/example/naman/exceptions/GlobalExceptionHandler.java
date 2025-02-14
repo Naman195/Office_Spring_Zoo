@@ -10,18 +10,44 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
+	
+	/**
+	 * this Handler is used for Handle the ResourceNotFound exception
+	 * @param ex
+	 * @return ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	 */
 
 	@ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 	
+	/**
+	 * this Handler is used for Handle the handleGlobalException  exception
+	 * @param ex
+	 * @return ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	 */
+	
 	@ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGlobalException(Exception ex) {
         return new ResponseEntity<>("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+	
+	/**
+	 * this Handler is used for Handle the MethodArgumentNotValidException exception
+	 * @param ex
+	 * @return ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	 */
 	
 	 @ExceptionHandler(MethodArgumentNotValidException.class)
 	    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {

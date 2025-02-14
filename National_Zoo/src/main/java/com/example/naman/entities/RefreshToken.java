@@ -1,6 +1,5 @@
 package com.example.naman.entities;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -15,17 +14,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Getter
 @Setter
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 @Entity
 public class RefreshToken {
-
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long tokenId;
@@ -37,5 +40,4 @@ public class RefreshToken {
 	private User user;
 	
 	private LocalDateTime expireAt;
-	
 }

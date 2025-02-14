@@ -8,9 +8,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler
 {
+	
+	/**
+	 * Exceptional Handler
+	 * @param ex
+	 * @param request
+	 * @return
+	 */
+	
 	@ExceptionHandler(value = { Exception.class })
 	protected ResponseEntity<Object> handleConflict(RuntimeException ex, WebRequest request) 
 	{

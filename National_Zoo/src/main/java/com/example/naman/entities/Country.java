@@ -11,6 +11,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Documentation
+ *
+ * @author Naman Arora
+ * @version 1.0.0
+ * @since 14-Feb-2025
+ */
+
 @Getter
 @Setter
 @Builder
@@ -22,7 +30,7 @@ public class Country {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name  = "country_id")
 	private Long countryId;
-	
+
 	@Column(name = "country_name", nullable = false)
 	private String countryName;
 }
